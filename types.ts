@@ -1,0 +1,65 @@
+
+export interface ProductVariant {
+  weight: string;
+  price: number;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  tags: string[];
+  intensity: number; // 1-5
+  roast: 'Light' | 'Medium' | 'Dark';
+  category: 'Beans' | 'Filter Powder' | 'Instant';
+  tastingNotes: string;
+  bestFor: string;
+  variants: ProductVariant[];
+}
+
+export interface CartItem extends Product {
+  selectedVariant: ProductVariant;
+  quantity: number;
+}
+
+export interface UserDetails {
+  name: string;
+  phone: string;
+  address: string;
+  city: string;
+  pincode: string;
+  email: string;
+}
+
+export interface User extends UserDetails {
+  id: string; // mapped from _id
+  _id?: string;
+  password?: string;
+  token?: string;
+  isAdmin?: boolean;
+  joinedDate?: string;
+}
+
+export interface Order {
+  id: string;
+  date: string;
+  customer: UserDetails;
+  items: CartItem[];
+  subtotal: number;
+  shipping: number;
+  total: number;
+  status: 'Pending' | 'Shipped' | 'Delivered';
+  userEmail?: string; // Link to user
+}
+
+export enum AppView {
+  HOME = 'HOME',
+  SHOP = 'SHOP',
+  CHECKOUT = 'CHECKOUT',
+  SUCCESS = 'SUCCESS',
+  ABOUT = 'ABOUT',
+  AUTH = 'AUTH',
+  PROFILE = 'PROFILE',
+  ADMIN = 'ADMIN',
+}
