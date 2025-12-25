@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { User } from '../types';
+import { GoogleLogin } from '@react-oauth/google';
 
 interface AuthPageProps {
   onBack: () => void;
@@ -36,6 +37,17 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack, onLogin }) => {
       } else {
         setError('Authentication failed. Please check connection.');
       }
+    }
+  };
+
+  const handleGoogleSuccess = async (response: any) => {
+    try {
+      const { googleLogin } = await import('../services/api');
+      const user = await googleLogin(response.credential);
+      onLogin(user);
+    } catch (err: any) {
+      console.error("Google Auth Error", err);
+      setError('Google Login failed.');
     }
   };
 
@@ -100,6 +112,25 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack, onLogin }) => {
             </div>
             {error && <p className="text-red-500 text-xs font-bold">{error}</p>}
             <button type="submit" className="w-full bg-coffee-900 text-white py-4 rounded-full font-bold uppercase tracking-widest hover:bg-gold-600 transition-all shadow-lg transform hover:-translate-y-1">{isLogin ? 'Login' : 'Sign Up'}</button>
+
+            {/* 
+            <div className="flex items-center gap-4 my-6">
+              <div className="flex-grow h-px bg-gray-200"></div>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">or continue with</span>
+              <div className="flex-grow h-px bg-gray-200"></div>
+            </div>
+
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError('Google Login Failed')}
+                useOneTap
+                theme="outline"
+                shape="pill"
+                width="100%"
+              />
+            </div>
+            */}
           </form>
           <div className="mt-8 text-center">
             <button onClick={() => setIsLogin(!isLogin)} className="text-gray-500 hover:text-gold-500 text-sm font-medium transition-colors">{isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}</button>

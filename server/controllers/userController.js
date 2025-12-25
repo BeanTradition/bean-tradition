@@ -1,6 +1,10 @@
+const { OAuth2Client } = require('google-auth-library');
 const supabase = require('../config/supabaseClient');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -19,7 +23,7 @@ const authUser = async (req, res) => {
             .from('users')
             .select('*')
             .eq('email', email)
-            .single(); // Use single() if expecting one
+            .single();
 
         if (error || !user) {
             return res.status(401).json({ message: 'Invalid email or password' });
@@ -29,7 +33,7 @@ const authUser = async (req, res) => {
 
         if (match) {
             res.json({
-                _id: user.id, // Frontend expects _id
+                _id: user.id,
                 id: user.id,
                 name: user.name,
                 email: user.email,
@@ -53,7 +57,6 @@ const authUser = async (req, res) => {
 const registerUser = async (req, res) => {
     const { name, email, password, phone } = req.body;
 
-    // 1. Check if user exists
     const { data: existingUser } = await supabase
         .from('users')
         .select('email')
@@ -65,20 +68,17 @@ const registerUser = async (req, res) => {
         return;
     }
 
-    // 2. Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 3. Admin Check
     const isAdmin = (email === 'beantradition@gmail.com' || email.includes('beantradition'));
 
-    // 4. Insert
     const { data: user, error } = await supabase
         .from('users')
         .insert([
             { name, email, password: hashedPassword, phone, isAdmin }
         ])
-        .select() // retrieve the inserted row
+        .select()
         .single();
 
     if (user && !error) {
@@ -100,7 +100,6 @@ const registerUser = async (req, res) => {
 // @route   GET /api/users/profile
 // @access  Private
 const getUserProfile = async (req, res) => {
-    // req.user is set by authMiddleware, checking if it works there too
     const user = req.user;
 
     if (user) {
@@ -162,4 +161,61 @@ const updateUserProfile = async (req, res) => {
     }
 };
 
-module.exports = { authUser, registerUser, getUserProfile, updateUserProfile };
+// @desc    Auth with Google
+// @route   POST /api/users/google-login
+// @access  Public
+const googleLogin = async (req, res) => {
+    const { credential } = req.body;
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const { email, name, sub } = payload;
+
+        let { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (!user) {
+            const isAdmin = (email === 'beantradition@gmail.com' || email.includes('beantradition'));
+            const randomPassword = crypto.randomBytes(16).toString('hex');
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+            const { data: newUser, error: insertError } = await supabase
+                .from('users')
+                .insert([
+                    { name, email, password: hashedPassword, isAdmin, phone: '' }
+                ])
+                .select()
+                .single();
+
+            if (insertError) {
+                console.error("Supabase Insert Error:", insertError);
+                return res.status(400).json({ message: 'Google Registration Failed' });
+            }
+            user = newUser;
+        }
+
+        res.json({
+            _id: user.id,
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            token: generateToken(user.id),
+            phone: user.phone,
+            address: user.address
+        });
+
+    } catch (err) {
+        console.error("Google verify error:", err);
+        res.status(401).json({ message: 'Invalid Google Token' });
+    }
+};
+
+module.exports = { authUser, registerUser, getUserProfile, updateUserProfile, googleLogin };

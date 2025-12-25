@@ -114,8 +114,8 @@ export const Profile: React.FC<ProfileProps> = ({ user, onBack, onLogout }) => {
                         <div className="flex items-center gap-6">
                           <div className="text-right">
                             <span className={`inline-block text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-1 ${order.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                                order.status === 'Shipped' ? 'bg-blue-100 text-blue-700' :
-                                  'bg-green-100 text-green-700'
+                              order.status === 'Shipped' ? 'bg-blue-100 text-blue-700' :
+                                'bg-green-100 text-green-700'
                               }`}>
                               {order.status}
                             </span>
@@ -124,7 +124,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onBack, onLogout }) => {
                         </div>
                       </div>
 
-                      {/* Visual Status Indicator / Progress Tracker */}
+                      {/* Visual Status Indicator / Progress Tracker COMMENTED OUT
                       <div className="mb-10 px-2">
                         <div className="relative">
                           <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 rounded-full overflow-hidden">
@@ -153,6 +153,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onBack, onLogout }) => {
                           </div>
                         </div>
                       </div>
+                      */}
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                         <div className="space-y-3">

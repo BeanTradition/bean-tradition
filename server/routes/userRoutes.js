@@ -5,11 +5,13 @@ const {
     registerUser,
     getUserProfile,
     updateUserProfile,
+    googleLogin,
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.post('/', registerUser);
 router.post('/login', authUser);
+router.post('/google-login', googleLogin);
 router
     .route('/profile')
     .get(protect, getUserProfile)

@@ -50,102 +50,84 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
     setIsProcessing(true);
 
     try {
-      const { createOrder } = await import('../services/api');
-
-      // --- TEMPORARY BYPASS FOR DEVELOPMENT WITHOUT RAZORPAY KEYS ---
-      // Simulating a successful payment directly
-      setTimeout(async () => {
-        try {
-          const newOrder = {
-            orderItems: cart.map(item => ({
-              name: item.name,
-              quantity: item.quantity,
-              image: item.image,
-              price: item.selectedVariant.price,
-              weight: item.selectedVariant.weight,
-              product: item._id || item.id
-            })),
-            shippingAddress: {
-              address: formData.address,
-              city: formData.city,
-              pincode: formData.pincode,
-              country: 'India',
-              phone: formData.phone
-            },
-            paymentMethod: 'Bypass (Dev)',
-            itemsPrice: subtotal,
-            taxPrice: 0,
-            shippingPrice: shipping,
-            totalPrice: total,
-            paymentResult: {
-              id: `bypass_${Date.now()}`,
-              status: 'completed',
-              update_time: new Date().toISOString(),
-              email_address: formData.email
-            }
-          };
-
-          await createOrder(newOrder);
-          onSuccess();
-        } catch (err: any) {
-          console.error("Order save failed DETAILS:", err);
-          if (err.response) {
-            console.error("Server Response:", err.response.data);
-            alert(`Failed to save order: ${JSON.stringify(err.response.data)}`);
-          } else {
-            alert(`Failed to save order: ${err.message}`);
-          }
-          setIsProcessing(false);
-        }
-      }, 1500);
-      // -------------------------------------------------------------
-
-      /* 
-      // RAZORPAY CODE (Commented out until keys are available)
       const { createRazorpayOrder, verifyRazorpayPayment, createOrder } = await import('../services/api');
-      const orderData = await createRazorpayOrder(total);
+
+      const orderCreationData = await createRazorpayOrder(total);
 
       const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_YOUR_KEY_HERE",
-          amount: orderData.amount,
-          currency: "INR",
-          name: "Bean Tradition",
-          description: "Premium Coffee Order",
-          image: "https://your-logo-url.com/logo.png",
-          order_id: orderData.id,
-          handler: async function (response: any) {
-              try {
-                  const verification = await verifyRazorpayPayment({
-                      orderCreationId: orderData.id,
-                      razorpayPaymentId: response.razorpay_payment_id,
-                      razorpayOrderId: response.razorpay_order_id,
-                      razorpaySignature: response.razorpay_signature,
-                  });
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_RvLe2x5GSSgUGN", // Set the fallback if needed or let env handle it
+        amount: orderCreationData.amount,
+        currency: "INR",
+        name: "Bean Tradition",
+        description: "Premium Coffee Order",
+        image: "https://image2url.com/images/1765869638860-a2498fc6-a31d-440d-add1-e20fe0269835.png",
+        order_id: orderCreationData.id,
+        handler: async function (response: any) {
+          try {
+            const verification = await verifyRazorpayPayment({
+              orderCreationId: orderCreationData.id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpaySignature: response.razorpay_signature,
+            });
 
-                  // Save Order logic here...
-                  await createOrder(newOrder);
-                  onSuccess();
-              } catch (error) {
-                  console.error("Payment verification failed", error);
-                  alert("Payment verification failed.");
-              }
-          },
-          prefill: {
-              name: formData.name,
-              email: formData.email,
-              contact: formData.phone,
-          },
-          theme: { color: "#A2672D" },
+            if (verification.msg === "success") {
+              const newOrder = {
+                orderItems: cart.map(item => ({
+                  name: item.name,
+                  quantity: item.quantity,
+                  image: item.image,
+                  price: item.selectedVariant.price,
+                  weight: item.selectedVariant.weight,
+                  product: item._id || item.id
+                })),
+                shippingAddress: {
+                  address: formData.address,
+                  city: formData.city,
+                  pincode: formData.pincode,
+                  country: 'India',
+                  phone: formData.phone
+                },
+                paymentMethod: 'Razorpay',
+                itemsPrice: subtotal,
+                taxPrice: 0,
+                shippingPrice: shipping,
+                totalPrice: total,
+                paymentResult: {
+                  id: response.razorpay_payment_id,
+                  status: 'paid',
+                  update_time: new Date().toISOString(),
+                  email_address: formData.email
+                }
+              };
+
+              await createOrder(newOrder);
+              onSuccess();
+            } else {
+              alert("Payment verification failed.");
+              setIsProcessing(false);
+            }
+          } catch (error: any) {
+            console.error("Payment verification failed", error);
+            alert("Payment verification failed.");
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: { color: "#A2672D" },
       };
 
       // @ts-ignore
       const rzp1 = new window.Razorpay(options);
       rzp1.on("payment.failed", function (response: any) {
-          alert(response.error.description);
-          setIsProcessing(false);
+        alert(response.error.description);
+        setIsProcessing(false);
       });
       rzp1.open();
-      */
 
     } catch (error) {
       console.error("Checkout error:", error);

@@ -115,9 +115,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                         <td className="p-4 font-bold">₹{order.total || order.totalPrice}</td>
                                         <td className="p-4 text-sm">{order.items?.length || (order as any).orderItems?.length} items</td>
                                         <td className="p-4">
-                                            <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                                                    order.status === 'Paid' ? 'bg-blue-100 text-blue-800' :
+                                                        'bg-yellow-100 text-yellow-800'
                                                 }`}>
-                                                {order.status}
+                                                {order.status || 'Pending'}
                                             </span>
                                         </td>
                                     </tr>

@@ -30,7 +30,8 @@ const addOrderItems = async (req, res) => {
                 "shippingPrice": shippingPrice,
                 "totalPrice": totalPrice,
                 "isPaid": true,
-                "paidAt": new Date().toISOString()
+                "paidAt": new Date().toISOString(),
+                "status": "Paid"
             }])
             .select()
             .single();

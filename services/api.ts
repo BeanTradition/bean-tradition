@@ -46,6 +46,11 @@ export const register = async (name: string, email: string, password: string, ph
     return data;
 };
 
+export const googleLogin = async (credential: string): Promise<User> => {
+    const { data } = await api.post('/users/google-login', { credential });
+    return data;
+};
+
 export const getProfile = async (): Promise<User> => {
     const { data } = await api.get('/users/profile');
     return data;
