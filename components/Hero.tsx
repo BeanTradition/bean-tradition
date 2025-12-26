@@ -15,7 +15,7 @@ export const Hero: React.FC<HeroProps> = ({ onShopNow }) => {
       */}
       <div className="absolute inset-0 bg-black">
         <img
-          src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
+          src="/assets/hero_bg.jpg"
           alt="Coffee Beans Roasting"
           className="w-full h-full object-cover opacity-60 animate-zoom-slow"
         />

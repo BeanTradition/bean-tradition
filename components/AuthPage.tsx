@@ -57,7 +57,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack, onLogin }) => {
       <div className="relative h-[60vh] flex items-center justify-center bg-black overflow-hidden group">
         <div className="absolute inset-0 opacity-60">
           <img
-            src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
+            src="/assets/auth_bg.jpg"
             alt="Coffee Background"
             className="w-full h-full object-cover grayscale animate-zoom-slow"
           />

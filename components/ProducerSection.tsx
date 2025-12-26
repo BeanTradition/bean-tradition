@@ -24,7 +24,7 @@ export const ProducerSection: React.FC = () => {
 
                     {/* Left: Brand / Info */}
                     <div className="w-full md:w-5/12 bg-coffee-900 text-white p-12 md:p-16 relative overflow-hidden flex flex-col justify-between group">
-                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-10"></div>
+                        <div className="absolute inset-0 bg-[url('/assets/wood_pattern.png')] opacity-10"></div>
                         <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-125 transition-transform duration-1000"></div>
 
                         <div className="relative z-10">

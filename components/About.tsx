@@ -12,28 +12,28 @@ const METHODOLOGY_STEPS = [
     title: "Ethical Sourcing",
     subtitle: "Rooted in Respect",
     description: "We work directly with farmers in the Western Ghats, ensuring fair wages and sustainable practices. Every bean has a traceable lineage.",
-    image: "https://images.unsplash.com/photo-1524350876685-274059332603?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/about_values_1.jpg"
   },
   {
     id: 1,
     title: "Artisan Roasting",
     subtitle: "Mastery of Fire",
     description: "Small batches roasted with obsession. We profile every bean to unlock its hidden potential, balancing acidity and body perfectly.",
-    image: "https://mtpak.coffee/wp-content/uploads/2021/12/New-Project-74.jpg"
+    image: "/assets/about_1.jpg"
   },
   {
     id: 2,
     title: "Precision Grinding",
     subtitle: "The Perfect Consistency",
     description: "Burr grinders that shave the bean rather than crushing it, preserving the volatile aromatics that define a great cup.",
-    image: "https://cdn.shopify.com/s/files/1/0918/3414/files/grind-coffee-beans.jpg?v=1668704315"
+    image: "/assets/about_2.jpg"
   },
   {
     id: 3,
     title: "Fresh Extraction",
     subtitle: "The Final Pour",
     description: "The final act. Whether espresso or filter, we provide the guidance and the quality for the perfect golden extraction.",
-    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/auth_bg.jpg"
   }
 ];
 
@@ -60,7 +60,7 @@ export const About: React.FC<AboutProps> = ({ onBack }) => {
       <div className="relative h-[60vh] flex items-center justify-center bg-black overflow-hidden group">
         <div className="absolute inset-0 opacity-60 transition-transform duration-[20s] ease-linear transform scale-100 animate-zoom-slow">
           <img
-            src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
+            src="/assets/profile_hero.jpg"
             alt="Coffee Story Hero"
             className="w-full h-full object-cover"
           />
@@ -105,7 +105,7 @@ export const About: React.FC<AboutProps> = ({ onBack }) => {
 
       {/* 2. THE METHODOLOGY */}
       <section className="py-20 bg-coffee-950 text-white overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('/assets/stardust.png')] opacity-10"></div>
 
         {METHODOLOGY_STEPS.map((step) => (
           <div
@@ -179,7 +179,7 @@ export const About: React.FC<AboutProps> = ({ onBack }) => {
       </section>
 
       {/* 3. Parallax Quote Break */}
-      <div className="relative h-[40vh] bg-fixed bg-center bg-cover bg-no-repeat flex items-center justify-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1497935586351-b67a49e012bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80')" }}>
+      <div className="relative h-[40vh] bg-fixed bg-center bg-cover bg-no-repeat flex items-center justify-center" style={{ backgroundImage: "url('/assets/hero_bg.jpg')" }}>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative z-10 text-center px-6">
           <h2 className="text-3xl md:text-5xl font-serif font-bold text-white leading-tight drop-shadow-2xl animate-fade-in-up">
@@ -195,7 +195,7 @@ export const About: React.FC<AboutProps> = ({ onBack }) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto px-6">
           <div className="group relative h-[400px] overflow-hidden rounded-sm shadow-xl cursor-pointer">
-            <img src="https://images.unsplash.com/photo-1552346989-e069318e20a5?q=80&w=800&auto=format&fit=crop" alt="AA Grade" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" />
+            <img src="/assets/aa_grade.jpg" alt="AA Grade" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
             <div className="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
               <div className="w-12 h-1 bg-gold-500 mb-4 group-hover:w-24 transition-all duration-500"></div>
@@ -206,7 +206,7 @@ export const About: React.FC<AboutProps> = ({ onBack }) => {
           </div>
 
           <div className="group relative h-[400px] overflow-hidden rounded-sm shadow-xl cursor-pointer">
-            <img src="https://images.unsplash.com/photo-1580933073521-dc49ac0d4e6a?q=80&w=800&auto=format&fit=crop" alt="Zero Defects" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" />
+            <img src="/assets/zero_defects.jpg" alt="Zero Defects" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
             <div className="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
               <div className="w-12 h-1 bg-gold-500 mb-4 group-hover:w-24 transition-all duration-500"></div>

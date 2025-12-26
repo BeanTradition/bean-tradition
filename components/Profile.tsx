@@ -53,7 +53,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onBack, onLogout }) => {
       <div className="relative h-[50vh] flex items-center justify-center bg-black overflow-hidden group">
         <div className="absolute inset-0 opacity-40">
           <img
-            src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
+            src="/assets/profile_hero.jpg"
             alt="Profile Hero"
             className="w-full h-full object-cover grayscale"
           />

@@ -1,149 +1,159 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bean Tradition - Artisanal Coffee</title>
-    <link rel="icon" type="image/png" href="https://image2url.com/images/1765869638860-a2498fc6-a31d-440d-add1-e20fe0269835.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fahkwang:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              coffee: {
-                50: '#FFF8F1',  /* User: Base Light (Cream) */
-                100: '#F9F1EB',
-                200: '#E0BE9A', /* User: Secondary (Tan) */
-                300: '#CDB092',
-                400: '#A68E76',
-                500: '#8A7563',
-                600: '#736152',
-                700: '#645448',
-                800: '#55473D',
-                900: '#5B4D43', /* User: Primary Dark (Dark Brown) - Mapped to 900 for main text */
-                950: '#3E342E', /* Darker shade for footer/nav contrast */
-              },
-              gold: {
-                400: '#A2672D', /* User: Accent (Bronze/Gold) */
-                500: '#8C5927',
-                600: '#754A20',
-              }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bean Tradition - Artisanal Coffee</title>
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fahkwang:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            coffee: {
+              50: '#FFF8F1',  /* User: Base Light (Cream) */
+              100: '#F9F1EB',
+              200: '#E0BE9A', /* User: Secondary (Tan) */
+              300: '#CDB092',
+              400: '#A68E76',
+              500: '#8A7563',
+              600: '#736152',
+              700: '#645448',
+              800: '#55473D',
+              900: '#5B4D43', /* User: Primary Dark (Dark Brown) - Mapped to 900 for main text */
+              950: '#3E342E', /* Darker shade for footer/nav contrast */
             },
-            fontFamily: {
-              serif: ['"Fahkwang"', 'sans-serif'], /* Headings mapped to Fahkwang */
-              sans: ['Helvetica', 'Arial', 'sans-serif'], /* Paragraphs mapped to Helvetica */
+            gold: {
+              400: '#A2672D', /* User: Accent (Bronze/Gold) */
+              500: '#8C5927',
+              600: '#754A20',
+            }
+          },
+          fontFamily: {
+            serif: ['"Fahkwang"', 'sans-serif'], /* Headings mapped to Fahkwang */
+            sans: ['Helvetica', 'Arial', 'sans-serif'], /* Paragraphs mapped to Helvetica */
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+            'fade-in': 'fadeIn 1s ease-out forwards',
+            'zoom-slow': 'zoomSlow 20s linear infinite alternate',
+            'float': 'float 10s infinite ease-in-out',
+            'slide-up-reveal': 'slideUpReveal 1s cubic-bezier(0.77, 0, 0.175, 1) forwards',
+            'grain': 'grain 8s steps(10) infinite',
+            'slide-in-right': 'slideInRightShort 0.4s ease-out forwards',
+            'pop': 'pop 0.2s ease-in-out',
+          },
+          transitionTimingFunction: {
+            'out-expo': 'cubic-bezier(0.19, 1, 0.22, 1)',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
             },
-            animation: {
-              'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
-              'fade-in': 'fadeIn 1s ease-out forwards',
-              'zoom-slow': 'zoomSlow 20s linear infinite alternate',
-              'float': 'float 10s infinite ease-in-out',
-              'slide-up-reveal': 'slideUpReveal 1s cubic-bezier(0.77, 0, 0.175, 1) forwards',
-              'grain': 'grain 8s steps(10) infinite',
-              'slide-in-right': 'slideInRightShort 0.4s ease-out forwards',
-              'pop': 'pop 0.2s ease-in-out',
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
             },
-            transitionTimingFunction: {
-              'out-expo': 'cubic-bezier(0.19, 1, 0.22, 1)',
+            zoomSlow: {
+              '0%': { transform: 'scale(1)' },
+              '100%': { transform: 'scale(1.1)' },
             },
-            keyframes: {
-              fadeInUp: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              zoomSlow: {
-                '0%': { transform: 'scale(1)' },
-                '100%': { transform: 'scale(1.1)' },
-              },
-              float: {
-                '0%, 100%': { transform: 'translateY(0) translateX(0)', opacity: '0' },
-                '50%': { opacity: '0.6' },
-                '100%': { transform: 'translateY(-100px) translateX(20px)', opacity: '0' },
-              },
-              slideUpReveal: {
-                '0%': { transform: 'translateY(100%)' },
-                '100%': { transform: 'translateY(0)' },
-              },
-              grain: {
-                '0%, 100%': { transform: 'translate(0, 0)' },
-                '10%': { transform: 'translate(-5%, -10%)' },
-                '20%': { transform: 'translate(-15%, 5%)' },
-                '30%': { transform: 'translate(7%, -25%)' },
-                '40%': { transform: 'translate(-5%, 25%)' },
-                '50%': { transform: 'translate(-15%, 10%)' },
-                '60%': { transform: 'translate(15%, 0%)' },
-                '70%': { transform: 'translate(0%, 15%)' },
-                '80%': { transform: 'translate(3%, 35%)' },
-                '90%': { transform: 'translate(-10%, 10%)' },
-              },
-              slideInRightShort: {
-                '0%': { opacity: '0', transform: 'translateX(20px)' },
-                '100%': { opacity: '1', transform: 'translateX(0)' },
-              },
-              pop: {
-                '0%': { transform: 'scale(1)' },
-                '50%': { transform: 'scale(1.2)' },
-                '100%': { transform: 'scale(1)' },
-              }
+            float: {
+              '0%, 100%': { transform: 'translateY(0) translateX(0)', opacity: '0' },
+              '50%': { opacity: '0.6' },
+              '100%': { transform: 'translateY(-100px) translateX(20px)', opacity: '0' },
+            },
+            slideUpReveal: {
+              '0%': { transform: 'translateY(100%)' },
+              '100%': { transform: 'translateY(0)' },
+            },
+            grain: {
+              '0%, 100%': { transform: 'translate(0, 0)' },
+              '10%': { transform: 'translate(-5%, -10%)' },
+              '20%': { transform: 'translate(-15%, 5%)' },
+              '30%': { transform: 'translate(7%, -25%)' },
+              '40%': { transform: 'translate(-5%, 25%)' },
+              '50%': { transform: 'translate(-15%, 10%)' },
+              '60%': { transform: 'translate(15%, 0%)' },
+              '70%': { transform: 'translate(0%, 15%)' },
+              '80%': { transform: 'translate(3%, 35%)' },
+              '90%': { transform: 'translate(-10%, 10%)' },
+            },
+            slideInRightShort: {
+              '0%': { opacity: '0', transform: 'translateX(20px)' },
+              '100%': { opacity: '1', transform: 'translateX(0)' },
+            },
+            pop: {
+              '0%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.2)' },
+              '100%': { transform: 'scale(1)' },
             }
           }
         }
       }
-    </script>
-    <style>
-      body {
-        font-family: 'Helvetica', 'Arial', sans-serif;
-        background-color: #FFF8F1;
-        color: #5B4D43;
-        overflow-x: hidden;
-      }
-      h1, h2, h3, h4, h5, h6 {
-        font-family: '"Fahkwang"', sans-serif;
-      }
-      .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-      }
-      .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-      }
-      /* Smooth scrolling for the whole page */
-      html {
-        scroll-behavior: smooth;
-      }
-      
-      /* Grain Overlay */
-      .grain-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
-        opacity: 0.04;
-        overflow: hidden;
-      }
-      .grain-overlay::before {
-        content: "";
-        position: absolute;
-        top: -100%;
-        left: -100%;
-        width: 300%;
-        height: 300%;
-        background-image: url("https://upload.wikimedia.org/wikipedia/commons/7/76/Noise_pattern_with_cross_sections.png");
-        background-size: 200px 200px;
-        animation: grain 8s steps(10) infinite;
-      }
-    </style>
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Helvetica', 'Arial', sans-serif;
+      background-color: #FFF8F1;
+      color: #5B4D43;
+      overflow-x: hidden;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: '"Fahkwang"', sans-serif;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Smooth scrolling for the whole page */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Grain Overlay */
+    .grain-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.04;
+      overflow: hidden;
+    }
+
+    .grain-overlay::before {
+      content: "";
+      position: absolute;
+      top: -100%;
+      left: -100%;
+      width: 300%;
+      height: 300%;
+      background-image: url("/assets/noise.png");
+      background-size: 200px 200px;
+      animation: grain 8s steps(10) infinite;
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -154,12 +164,13 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/index.css">
 </head>
-  <body>
-    <div class="grain-overlay"></div>
-    <div id="root"></div>
+
+<body>
+  <div class="grain-overlay"></div>
+  <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>
-    

@@ -36,44 +36,43 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart, onNavigat
 
   return (
     <>
-      <nav 
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-700 ease-in-out ${
-          isScrolled ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
-        }`}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-700 ease-in-out ${isScrolled ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
+          }`}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-transparent h-48 pointer-events-none" />
 
         <div className="container mx-auto px-8 py-6 relative flex justify-between items-center">
-          <div 
-            className="flex items-center cursor-pointer group" 
+          <div
+            className="flex items-center cursor-pointer group"
             onClick={handleHomeClick}
           >
-            <img 
-              src="https://image2url.com/images/1765869638860-a2498fc6-a31d-440d-add1-e20fe0269835.png" 
-              alt="Bean Tradition Logo" 
+            <img
+              src="/assets/logo.png"
+              alt="Bean Tradition Logo"
               className="h-28 md:h-36 w-auto object-contain transform group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_25px_rgba(255,255,255,0.3)]"
             />
           </div>
-          
+
           <div className="flex items-center gap-10 md:gap-14">
-            <button 
+            <button
               onClick={() => onNavigate(AppView.SHOP)}
               className="hidden md:block text-white/95 hover:text-gold-400 transition-colors text-lg font-serif italic tracking-wider relative group"
             >
               Shop
               <span className="absolute -bottom-2 left-1/2 w-0 h-px bg-gold-400 transition-all group-hover:w-full group-hover:left-0 duration-500 ease-out"></span>
             </button>
-            <button 
+            <button
               onClick={() => onNavigate(AppView.ABOUT)}
               className="hidden md:block text-white/95 hover:text-gold-400 transition-colors text-lg font-serif italic tracking-wider relative group"
             >
               Our Story
               <span className="absolute -bottom-2 left-1/2 w-0 h-px bg-gold-400 transition-all group-hover:w-full group-hover:left-0 duration-500 ease-out"></span>
             </button>
-            
+
             <div className="flex items-center gap-6">
               {/* Account Access */}
-              <button 
+              <button
                 onClick={handleAccountClick}
                 className="group p-2 flex items-center gap-2 text-white/90 hover:text-gold-400 transition-colors"
                 title={currentUser ? "View Profile" : "Login / Signup"}
@@ -103,10 +102,9 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart, onNavigat
       </nav>
 
       {/* State 2: Capsule Menu */}
-      <div 
-        className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) ${
-          isScrolled ? 'translate-y-0 opacity-100' : '-translate-y-32 opacity-0 pointer-events-none'
-        }`}
+      <div
+        className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) ${isScrolled ? 'translate-y-0 opacity-100' : '-translate-y-32 opacity-0 pointer-events-none'
+          }`}
       >
         <div className="bg-white/95 backdrop-blur-xl border border-coffee-200 shadow-2xl rounded-full px-6 py-3 flex items-center gap-5 ring-1 ring-coffee-100/50">
           <button onClick={handleHomeClick} className="text-coffee-900 hover:text-gold-600 transition-colors p-1"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>

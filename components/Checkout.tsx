@@ -60,7 +60,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
         currency: "INR",
         name: "Bean Tradition",
         description: "Premium Coffee Order",
-        image: "https://image2url.com/images/1765869638860-a2498fc6-a31d-440d-add1-e20fe0269835.png",
+        image: "/assets/logo.png",
         order_id: orderCreationData.id,
         handler: async function (response: any) {
           try {
