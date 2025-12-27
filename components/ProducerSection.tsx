@@ -4,13 +4,26 @@ import React, { useState } from 'react';
 export const ProducerSection: React.FC = () => {
     const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
 
-    const handleQuerySubmit = (e: React.FormEvent) => {
+    const handleQuerySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const queryData = {
+            name: formData.get('name') as string,
+            email: formData.get('email') as string,
+            type: formData.get('type') as string,
+            message: formData.get('message') as string,
+        };
+
         setFormStatus('sending');
-        // Simulate network request
-        setTimeout(() => {
+        try {
+            const { sendQuery } = await import('../services/api');
+            await sendQuery(queryData);
             setFormStatus('sent');
-        }, 1500);
+        } catch (error) {
+            console.error("Failed to send query", error);
+            alert("Failed to send message. Please try again later.");
+            setFormStatus('idle');
+        }
     };
 
     return (
@@ -86,18 +99,18 @@ export const ProducerSection: React.FC = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
                                             <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Name</label>
-                                            <input required type="text" className="w-full border-b border-gray-300 py-2 focus:border-gold-500 outline-none transition-colors bg-transparent placeholder-gray-300 text-coffee-900" placeholder="Your Name" />
+                                            <input required name="name" type="text" className="w-full border-b border-gray-300 py-2 focus:border-gold-500 outline-none transition-colors bg-transparent placeholder-gray-300 text-coffee-900" placeholder="Your Name" />
                                         </div>
                                         <div>
                                             <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Email</label>
-                                            <input required type="email" className="w-full border-b border-gray-300 py-2 focus:border-gold-500 outline-none transition-colors bg-transparent placeholder-gray-300 text-coffee-900" placeholder="your@email.com" />
+                                            <input required name="email" type="email" className="w-full border-b border-gray-300 py-2 focus:border-gold-500 outline-none transition-colors bg-transparent placeholder-gray-300 text-coffee-900" placeholder="your@email.com" />
                                         </div>
                                     </div>
 
                                     <div>
                                         <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Query Type</label>
                                         <div className="relative">
-                                            <select className="w-full border-b border-gray-300 py-2 focus:border-gold-500 outline-none transition-colors bg-transparent text-coffee-900 appearance-none cursor-pointer">
+                                            <select name="type" className="w-full border-b border-gray-300 py-2 focus:border-gold-500 outline-none transition-colors bg-transparent text-coffee-900 appearance-none cursor-pointer">
                                                 <option>General Inquiry</option>
                                                 <option>Wholesale / Bulk Order</option>
                                                 {/* <option>Several Roast Profiles</option> */}
@@ -111,7 +124,7 @@ export const ProducerSection: React.FC = () => {
 
                                     <div>
                                         <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Message</label>
-                                        <textarea required rows={4} className="w-full border-b border-gray-300 py-2 focus:border-gold-500 outline-none transition-colors bg-transparent placeholder-gray-300 resize-none text-coffee-900" placeholder="Tell us about your coffee needs..."></textarea>
+                                        <textarea required name="message" rows={4} className="w-full border-b border-gray-300 py-2 focus:border-gold-500 outline-none transition-colors bg-transparent placeholder-gray-300 resize-none text-coffee-900" placeholder="Tell us about your coffee needs..."></textarea>
                                     </div>
 
                                     <button

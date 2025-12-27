@@ -76,7 +76,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onBack, onLogout }) => {
           <h1 className="text-4xl md:text-6xl font-serif font-bold tracking-tight">
             Greetings, <span className="text-gold-400">{user.name.split(' ')[0]}</span>
           </h1>
-          <p className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-white/60">Member since {user.joinedDate}</p>
+
         </div>
       </div>
 

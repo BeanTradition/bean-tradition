@@ -115,3 +115,13 @@ export const deliverOrder = async (id: string): Promise<Order> => {
 export const deleteProduct = async (id: string): Promise<void> => {
     await api.delete(`/products/${id}`);
 };
+
+export const sendQuery = async (queryData: { name: string, email: string, type: string, message: string }) => {
+    const { data } = await api.post('/queries', queryData);
+    return data;
+};
+
+export const getAllQueries = async () => {
+    const { data } = await api.get('/queries');
+    return data;
+};

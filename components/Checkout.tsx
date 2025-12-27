@@ -29,7 +29,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
   }, [currentUser]);
 
   const subtotal = cart.reduce((acc, item) => acc + (item.selectedVariant.price * item.quantity), 0);
-  const shipping = subtotal > 2000 ? 0 : 100;
+  const shipping = subtotal >= 499 ? 0 : 100;
   const total = subtotal + shipping;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -118,13 +118,36 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
           email: formData.email,
           contact: formData.phone,
         },
-        theme: { color: "#A2672D" },
+        theme: {
+          color: "#8B4513",
+          backdrop_color: "rgba(0,0,0,0.85)"
+        },
+        retry: {
+          enabled: true,
+          max_count: 3
+        },
+        remember_customer: true,
+        config: {
+          display: {
+            preferences: {
+              show_default_blocks: true,
+            }
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          },
+          backdropclose: false,
+          escape: true
+        }
       };
 
       // @ts-ignore
       const rzp1 = new window.Razorpay(options);
       rzp1.on("payment.failed", function (response: any) {
-        alert(response.error.description);
+        console.error("Payment failed", response.error);
+        alert(`Payment Failed: ${response.error.description || "Something went wrong"}`);
         setIsProcessing(false);
       });
       rzp1.open();
@@ -207,6 +230,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
           <div className="border-t border-gray-100 pt-4 space-y-2">
             <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>₹{subtotal}</span></div>
             <div className="flex justify-between text-gray-600"><span>Shipping</span><span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span></div>
+            {shipping > 0 && (
+              <p className="text-[10px] text-gold-600 font-bold text-right italic">+ Add ₹{499 - subtotal} more for Free Delivery</p>
+            )}
           </div>
           <div className="border-t border-gray-200 pt-4 mt-4 flex justify-between items-center">
             <span className="font-serif font-bold text-xl text-coffee-900">Total</span>
