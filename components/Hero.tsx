@@ -47,28 +47,28 @@ export const Hero: React.FC<HeroProps> = ({ onShopNow }) => {
         ))}
       </div>
 
-      <div id="hero-content" className="relative z-10 text-center text-white px-4 max-w-7xl pt-20">
+      <div id="hero-content" className="relative z-10 text-center text-white px-4 max-w-7xl pt-32 md:pt-56 pb-12 md:pb-24">
 
         {/* Masked Reveal for Subtitle */}
-        <div className="overflow-hidden mb-4">
+        <div className="overflow-hidden mb-4 md:mb-6">
           <div className="animate-slide-up-reveal" style={{ animationDelay: '0.2s' }}>
-            <h2 className="text-xl md:text-3xl font-light tracking-[0.4em] uppercase text-gold-400">
+            <h2 className="text-lg md:text-2xl font-light tracking-[0.3em] md:tracking-[0.4em] uppercase text-gold-400">
               Direct from Farms
             </h2>
           </div>
         </div>
 
         {/* Masked Reveal for Main Title */}
-        <div className="overflow-hidden mb-8 py-2">
+        <div className="overflow-hidden mb-8 md:mb-12 py-2 md:py-4 px-4 md:px-8">
           <div className="animate-slide-up-reveal" style={{ animationDelay: '0.4s' }}>
-            <h1 className="text-7xl md:text-9xl lg:text-[11rem] font-serif font-bold leading-none drop-shadow-2xl">
-              Bean <span className="italic font-light text-coffee-100">Tradition</span>
+            <h1 className="text-5xl md:text-8xl lg:text-[9rem] font-serif font-bold leading-[0.9] drop-shadow-2xl px-2">
+              Bean <span className="italic font-light text-coffee-100 border-b-2 border-gold-500/30">Tradition</span>
             </h1>
           </div>
         </div>
 
         <div className="animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-          <p className="text-lg md:text-2xl text-gray-200 mb-12 max-w-3xl mx-auto font-light leading-relaxed drop-shadow-md">
+          <p className="text-sm md:text-xl text-gray-200 mb-10 md:mb-14 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md px-4">
             Discover the rich aroma and exquisite taste of our premium coffee beans, directly from the farms. We offer a range of Arabica, Robusta blends and Instant mix, freshly roasted to perfection.
           </p>
         </div>
@@ -76,7 +76,7 @@ export const Hero: React.FC<HeroProps> = ({ onShopNow }) => {
         <div className="animate-fade-in-up" style={{ animationDelay: '1s' }}>
           <button
             onClick={onShopNow}
-            className="group relative px-14 py-6 bg-transparent border-2 border-white/20 text-white font-bold uppercase tracking-widest text-lg overflow-hidden transition-all duration-500 hover:border-gold-500"
+            className="group relative px-10 py-5 bg-transparent border-2 border-white/20 text-white font-bold uppercase tracking-widest text-base overflow-hidden transition-all duration-500 hover:border-gold-500"
           >
             <div className="absolute inset-0 w-0 bg-gold-500 transition-all duration-[250ms] ease-out group-hover:w-full opacity-90"></div>
             <span className="relative z-10 group-hover:text-white transition-colors">Explore Collection</span>
@@ -84,9 +84,9 @@ export const Hero: React.FC<HeroProps> = ({ onShopNow }) => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-70">
-        <svg className="w-8 h-8 text-white" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+      {/* Scroll Indicator - Even lower and more subtle */}
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce opacity-40">
+        <svg className="w-5 h-5 text-white" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
           <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
         </svg>
       </div>

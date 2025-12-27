@@ -75,7 +75,6 @@ export const ProducerSection: React.FC = () => {
                         </div>
 
                         <div className="relative z-10 mt-12">
-                            <p className="text-xs text-coffee-400 uppercase tracking-widest">Karnataka, India</p>
                         </div>
                     </div>
 

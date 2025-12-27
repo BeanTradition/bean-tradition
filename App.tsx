@@ -22,11 +22,23 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
+  const [resetToken, setResetToken] = useState<string | null>(null);
+
   useEffect(() => {
     // Check for active session
     const savedSession = localStorage.getItem('kaapi_session');
     if (savedSession) {
       setCurrentUser(JSON.parse(savedSession));
+    }
+
+    // Check for reset password token in URL
+    const pathname = window.location.pathname;
+    if (pathname.includes('/reset-password/')) {
+      const token = pathname.split('/reset-password/')[1];
+      if (token) {
+        setResetToken(token);
+        setView(AppView.RESET_PASSWORD);
+      }
     }
   }, []);
 
@@ -103,7 +115,7 @@ function App() {
         <h2 className="text-2xl font-serif font-bold mb-4 text-gold-400">Bean Tradition</h2>
         <p className="mb-6 opacity-70">Premium Coffee Beans • Sourced from the farms</p>
         <div className="flex justify-center gap-6 text-sm uppercase tracking-widest opacity-60 items-center">
-          <a href="mailto:beantradition@gmail.com" className="hover:text-gold-400 transition-colors">Email</a>
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=beantradition@gmail.com" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">Email</a>
           <a href="https://www.instagram.com/beantradition/" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">Instagram</a>
           <a href="https://wa.me/919985802734" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors flex items-center gap-1">
             <span>+91-9985802734</span>
@@ -118,7 +130,11 @@ function App() {
 
   const renderView = () => {
     if (view === AppView.AUTH) {
-      return <AuthPage onBack={() => setView(AppView.HOME)} onLogin={handleLogin} />;
+      return <AuthPage onBack={() => setView(AppView.HOME)} onLogin={handleLogin} initialMode="login" />;
+    }
+
+    if (view === AppView.RESET_PASSWORD) {
+      return <AuthPage onBack={() => setView(AppView.HOME)} onLogin={handleLogin} initialMode="reset" resetToken={resetToken || ''} />;
     }
 
     if (view === AppView.ADMIN && currentUser?.isAdmin) {
@@ -215,7 +231,7 @@ function App() {
       <Navbar cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)} onOpenCart={() => setIsCartOpen(true)} onNavigate={setView} currentUser={currentUser} />
       {renderView()}
       <ProductModal product={selectedProduct} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddToCart={addToCart} />
-      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} items={cart.map(c => ({ ...c, id: `${c.id}-${c.selectedVariant.weight}` }))} onUpdateQuantity={updateQuantityComposite} onRemoveItem={removeItemComposite} onCheckout={() => { setIsCartOpen(false); setView(AppView.CHECKOUT); }} />
+      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} items={cart.map(c => ({ ...c, id: `${c.id}-${c.selectedVariant.weight}` }))} onUpdateQuantity={updateQuantityComposite} onRemoveItem={removeItemComposite} onCheckout={() => { setIsCartOpen(false); if (currentUser) { setView(AppView.CHECKOUT); } else { setView(AppView.AUTH); } }} />
     </>
   );
 }

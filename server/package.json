@@ -17,6 +17,7 @@
         "google-auth-library": "^10.5.0",
         "helmet": "^7.1.0",
         "jsonwebtoken": "^9.0.2",
+        "nodemailer": "^7.0.12",
         "razorpay": "^2.9.2"
     },
     "devDependencies": {

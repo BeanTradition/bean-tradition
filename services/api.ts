@@ -116,6 +116,16 @@ export const deleteProduct = async (id: string): Promise<void> => {
     await api.delete(`/products/${id}`);
 };
 
+export const forgotPassword = async (email: string) => {
+    const { data } = await api.post('/users/forgotpassword', { email });
+    return data;
+};
+
+export const resetPassword = async (token: string, password: string) => {
+    const { data } = await api.put(`/users/resetpassword/${token}`, { password });
+    return data;
+};
+
 export const sendQuery = async (queryData: { name: string, email: string, type: string, message: string }) => {
     const { data } = await api.post('/queries', queryData);
     return data;

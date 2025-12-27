@@ -62,4 +62,5 @@ export enum AppView {
   AUTH = 'AUTH',
   PROFILE = 'PROFILE',
   ADMIN = 'ADMIN',
+  RESET_PASSWORD = 'RESET_PASSWORD',
 }

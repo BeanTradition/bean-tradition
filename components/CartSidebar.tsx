@@ -11,20 +11,31 @@ interface CartSidebarProps {
   onCheckout: () => void;
 }
 
-export const CartSidebar: React.FC<CartSidebarProps> = ({ 
-  isOpen, 
-  onClose, 
-  items, 
-  onUpdateQuantity, 
+export const CartSidebar: React.FC<CartSidebarProps> = ({
+  isOpen,
+  onClose,
+  items,
+  onUpdateQuantity,
   onRemoveItem,
   onCheckout
 }) => {
   const subtotal = items.reduce((acc, item) => acc + (item.selectedVariant.price * item.quantity), 0);
 
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   return (
     <>
       {/* Backdrop */}
-      <div 
+      <div
         className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       />
@@ -47,7 +58,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               <p className="text-lg">Your cart is empty</p>
-              <button 
+              <button
                 onClick={onClose}
                 className="mt-4 text-gold-500 font-bold hover:underline"
               >
@@ -57,8 +68,8 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
           ) : (
             <div className="space-y-6">
               {items.map((item, idx) => (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className="flex gap-4 border-b border-gray-100 pb-4 animate-slide-in-right"
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
@@ -70,27 +81,27 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                     <p className="text-sm text-gray-500 mb-2">{item.selectedVariant.weight} • {item.roast}</p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center border border-gray-300 rounded-sm">
-                        <button 
+                        <button
                           onClick={() => onUpdateQuantity(item.id, -1)}
                           className="px-2 py-1 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors active:scale-75 transform duration-100"
                         >
                           -
                         </button>
-                        <span 
-                          key={item.quantity} 
+                        <span
+                          key={item.quantity}
                           className="px-2 text-sm font-bold w-6 text-center animate-pop"
                         >
                           {item.quantity}
                         </span>
-                        <button 
+                        <button
                           onClick={() => onUpdateQuantity(item.id, 1)}
                           className="px-2 py-1 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors active:scale-75 transform duration-100"
                         >
                           +
                         </button>
                       </div>
-                      <span 
-                        key={item.quantity * item.selectedVariant.price} 
+                      <span
+                        key={item.quantity * item.selectedVariant.price}
                         className="font-bold text-coffee-800 animate-fade-in"
                       >
                         ₹{item.selectedVariant.price * item.quantity}
@@ -110,7 +121,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
               <span key={subtotal} className="text-xl font-bold text-coffee-900 animate-pop">₹{subtotal}</span>
             </div>
             <p className="text-xs text-gray-500 mb-4 text-center">Shipping & taxes calculated at checkout</p>
-            <button 
+            <button
               onClick={onCheckout}
               className="w-full bg-coffee-900 text-white py-4 rounded-sm font-bold uppercase tracking-widest hover:bg-coffee-800 transition-colors hover:shadow-lg transform active:scale-95 duration-200"
             >

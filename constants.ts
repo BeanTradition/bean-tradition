@@ -32,7 +32,7 @@ export const PRODUCTS: Product[] = [
     roast: "Dark",
     category: "Beans",
     tastingNotes: "Dark Chocolate & Spice",
-    bestFor: "Espresso & Cold Brew",
+    bestFor: "Strong Espresso & Cold Brew",
     variants: [
       { weight: "250gm", price: 399 },
       /* 
@@ -52,7 +52,7 @@ export const PRODUCTS: Product[] = [
     roast: "Medium",
     category: "Beans",
     tastingNotes: "Caramel & Berries",
-    bestFor: "Pour Over & AeroPress",
+    bestFor: "Pour Over, French Press & Black Coffee",
     variants: [
       { weight: "250gm", price: 499 },
       /* 
@@ -72,7 +72,7 @@ export const PRODUCTS: Product[] = [
     roast: "Medium",
     category: "Filter Powder",
     tastingNotes: "Bold Cocoa & Chicory",
-    bestFor: "South Indian Filter",
+    bestFor: "Traditional South Indian Filter",
     variants: [
       { weight: "250gm", price: 299 },
       /* 
@@ -92,7 +92,7 @@ export const PRODUCTS: Product[] = [
     roast: "Medium",
     category: "Instant",
     tastingNotes: "Nutty & Smooth",
-    bestFor: "Latte & Frappe",
+    bestFor: "Traveling & Quick Hot/Cold Coffee",
     variants: [
       { weight: "200gm", price: 399 },
       /* 

@@ -19,7 +19,7 @@ export const USP: React.FC = () => {
               The Artisan <br /><span className="text-coffee-300 italic">Covenant</span>
             </h2>
           </div>
-          <p className="text-white/60 max-w-md text-sm md:text-base font-light leading-relaxed">
+          <p className="text-white/70 max-w-2xl text-xl md:text-3xl font-light leading-snug">
             We don't just sell coffee; we curate an experience. From the farms to your morning cup, every step is a promise of perfection.
           </p>
         </div>
@@ -37,10 +37,13 @@ export const USP: React.FC = () => {
               key={index}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
+              onClick={() => setHoveredIndex(hoveredIndex === index ? null : index)}
               className={`
                 relative h-full transition-all duration-700 ease-out-expo overflow-hidden group cursor-pointer border-b md:border-b-0 md:border-r border-white/10
-                ${isAnyHovered && !isHovered ? 'flex-[1] opacity-60 grayscale' : 'flex-[1] md:flex-[3] grayscale-0 opacity-100'}
+                flex-[1] md:flex-[3] grayscale-0 opacity-100
+                ${isAnyHovered && !isHovered ? 'md:flex-[1] md:opacity-60 md:grayscale' : ''}
                 ${!isAnyHovered ? 'flex-[1]' : ''}
+                ${isHovered ? 'flex-[2] md:flex-[3]' : 'flex-[1]'}
               `}
             >
               {/* Background Image with Zoom Effect */}
@@ -53,36 +56,40 @@ export const USP: React.FC = () => {
                     ${isHovered ? 'scale-110' : 'scale-100'}
                   `}
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-500 ${isHovered ? 'opacity-90' : 'opacity-70'}`}></div>
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 md:via-black/40 to-transparent transition-opacity duration-500 ${isHovered ? 'opacity-95' : 'opacity-80 md:opacity-70'}`}></div>
               </div>
 
               {/* Content */}
-              <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-end z-20">
+              <div className="absolute inset-0 p-6 md:p-12 flex flex-col justify-end z-20">
                 {/* Number Watermark */}
-                <div className="absolute top-8 right-8 text-8xl font-serif font-bold text-white/5 select-none pointer-events-none transition-transform duration-700 transform group-hover:-translate-y-4">
+                <div className="absolute top-6 md:top-8 right-6 md:right-8 text-6xl md:text-8xl font-serif font-bold text-white/5 select-none pointer-events-none transition-transform duration-700 transform group-hover:-translate-y-4">
                   0{index + 1}
                 </div>
 
-                <div className={`transition-all duration-500 transform ${isHovered ? 'translate-y-0' : 'translate-y-4'}`}>
-                  <div className="w-12 h-1 bg-gold-500 mb-6 transition-all duration-500 group-hover:w-24"></div>
+                <div className={`transition-all duration-500 transform ${isHovered ? 'translate-y-0' : 'translate-y-2 md:translate-y-4'}`}>
+                  <div className="w-8 md:w-12 h-1 bg-gold-500 mb-4 md:mb-6 transition-all duration-500 group-hover:w-24"></div>
 
-                  <h3 className="text-2xl md:text-4xl font-serif font-bold text-white mb-4 group-hover:text-gold-400 transition-colors">
+                  <h3 className="text-xl md:text-4xl font-serif font-bold text-white mb-2 md:mb-4 group-hover:text-gold-400 transition-colors">
                     {item.title}
                   </h3>
 
                   <div className={`
                     overflow-hidden transition-all duration-700 ease-out-expo
-                    ${isHovered || window.innerWidth < 768 ? 'max-h-48 opacity-100 mt-0' : 'max-h-0 opacity-0 md:max-h-0'} 
-                    /* On mobile, we might want text visible or keep interaction. Here we allow hover logic or show on small screens */
+                    ${isHovered ? 'max-h-48 opacity-100 mt-0' : 'max-h-0 opacity-0'} 
                   `}>
-                    <p className="text-coffee-100 text-base md:text-lg font-light leading-relaxed max-w-xl">
+                    <p className="text-coffee-100 text-sm md:text-lg font-light leading-relaxed max-w-xl">
                       {item.description}
                     </p>
                   </div>
 
-                  {/* "Explore" Indicator only visible when NOT hovered on desktop to encourage interaction */}
-                  <div className={`mt-4 md:hidden ${isHovered ? 'hidden' : 'block'} text-gold-500 text-xs font-bold uppercase tracking-widest`}>
-                    Tap to Reveal
+                  {/* "Explore" Indicator only visible when NOT hovered to encourage interaction */}
+                  <div className={`mt-2 transition-opacity duration-300 ${!isHovered ? 'opacity-100' : 'opacity-0 h-0'}`}>
+                    <span className="text-gold-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                      {window.innerWidth < 768 ? 'Tap to Reveal' : 'Hover to Explore'}
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>

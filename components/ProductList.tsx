@@ -62,7 +62,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
           <span className="text-gold-600 font-bold uppercase tracking-widest text-sm">
             Taste The Legacy
           </span>
-          <h2 className="text-5xl md:text-6xl font-serif font-bold text-coffee-900 mt-4 mb-6">
+          <h2 className="text-4xl md:text-6xl font-serif font-bold text-coffee-900 mt-4 mb-6">
             Our Collection
           </h2>
           <div className="w-20 h-1 bg-gold-500 mx-auto rounded-full"></div>
@@ -87,20 +87,20 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 min-h-[400px]">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-12 min-h-[400px]">
         {loading ? (
-          <div className="col-span-1 md:col-span-3 flex justify-center items-center h-[400px]">
+          <div className="col-span-2 md:col-span-3 flex justify-center items-center h-[400px]">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold-500"></div>
           </div>
         ) : displayProducts.length > 0 ? (
           displayProducts.map((product, index) => (
             <div
               key={product.id}
-              className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer flex flex-col border border-transparent hover:border-gold-200 transform hover:-translate-y-2"
+              className="group bg-white rounded-xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer flex flex-col border border-coffee-100 hover:border-gold-200"
               onClick={() => handleCardClick(product)}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="relative h-80 overflow-hidden bg-gray-100">
+              <div className="relative h-44 md:h-80 overflow-hidden bg-gray-100">
                 <img
                   src={product.image}
                   alt={product.name}
@@ -108,41 +108,41 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500"></div>
 
-                {/* Badge */}
-                <div className="absolute top-4 left-4 bg-white/95 px-4 py-2 text-xs font-bold uppercase tracking-widest text-coffee-900 shadow-sm backdrop-blur-sm rounded-sm">
-                  {product.category === 'Beans' ? `${product.roast} Roast` : product.category}
+                {/* Badge - Smaller on mobile */}
+                <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white/95 px-2 md:px-4 py-1 md:py-2 text-[8px] md:text-xs font-bold uppercase tracking-tighter md:tracking-widest text-coffee-900 shadow-sm backdrop-blur-sm rounded-sm">
+                  {product.category === 'Beans' ? `${product.roast} Roast` : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
                 </div>
               </div>
 
-              <div className="p-8 flex flex-col flex-grow bg-white relative">
-                <div className="absolute -top-6 right-8 bg-gold-500 text-white w-12 h-12 flex items-center justify-center rounded-full shadow-lg text-lg font-bold z-10 group-hover:bg-coffee-900 group-hover:scale-110 transition-all duration-300">
+              <div className="p-4 md:p-8 flex flex-col flex-grow bg-white relative">
+                <div className="absolute -top-4 right-4 md:-top-6 md:right-8 bg-gold-500 text-white w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 group-hover:bg-coffee-900 group-hover:scale-110 transition-all duration-300">
                   {mode === 'home' ? '→' : '+'}
                 </div>
 
-                <div className="mb-3">
+                <div className="mb-2 hidden md:block">
                   {product.tags.slice(0, 2).map(tag => (
                     <span key={tag} className="text-xs text-gold-600 mr-3 font-bold uppercase tracking-wider">{tag}</span>
                   ))}
                 </div>
 
-                <h3 className="text-2xl font-serif font-bold text-coffee-900 mb-3 group-hover:text-gold-600 transition-colors duration-300">
+                <h3 className="text-sm md:text-2xl font-serif font-bold text-coffee-900 mb-1 md:mb-3 group-hover:text-gold-600 transition-colors duration-300 line-clamp-1">
                   {product.name}
                 </h3>
 
-                <p className="text-gray-500 text-sm leading-relaxed mb-6 flex-grow font-light line-clamp-3">
+                <p className="text-gray-500 text-[10px] md:text-sm leading-tight md:leading-relaxed mb-4 md:mb-6 flex-grow font-light line-clamp-2 md:line-clamp-3">
                   {product.description}
                 </p>
 
-                <div className="flex items-center justify-between mt-auto pt-6 border-t border-gray-100 group-hover:border-gold-100 transition-colors">
-                  <span className="text-xl font-serif font-bold text-coffee-900">₹{product.variants[0].price}</span>
+                <div className="flex items-center justify-between mt-auto pt-3 md:pt-6 border-t border-gray-100 group-hover:border-gold-100 transition-colors">
+                  <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{product.variants[0].price}</span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleCardClick(product);
                     }}
-                    className="text-sm font-bold uppercase tracking-widest text-coffee-900 hover:text-gold-600 transition-colors flex items-center gap-2 group/btn"
+                    className="hidden sm:flex text-sm font-bold uppercase tracking-widest text-coffee-900 hover:text-gold-600 transition-colors items-center gap-2 group/btn"
                   >
-                    {mode === 'home' ? 'View Details' : 'Select Size'}
+                    {mode === 'home' ? 'View' : 'Select'}
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>

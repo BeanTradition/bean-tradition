@@ -3,6 +3,7 @@ const supabase = require('../config/supabaseClient');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -218,4 +219,138 @@ const googleLogin = async (req, res) => {
     }
 };
 
-module.exports = { authUser, registerUser, getUserProfile, updateUserProfile, googleLogin };
+// @desc    Forgot password
+// @route   POST /api/users/forgotpassword
+// @access  Public
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error || !user) {
+            return res.status(404).json({ message: 'User not found with that email' });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(20).toString('hex');
+
+        // Hash token and set expiry (10 mins)
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .digest('hex');
+
+        const resetExpires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({
+                reset_password_token: hashedToken,
+                reset_password_expires: resetExpires
+            })
+            .eq('id', user.id);
+
+        if (updateError) {
+            return res.status(500).json({ message: 'Error updating user reset token' });
+        }
+
+        // Create reset URL
+        // In local dev, it would be http://localhost:5173/reset-password/${resetToken}
+        // But since we use view-based routing, we'll send a simple code or just the link
+        const resetUrl = `${req.get('origin')}/reset-password/${resetToken}`;
+
+        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a put request to: \n\n ${resetUrl}`;
+
+        const html = `
+            <div style="font-family: serif; color: #333;">
+                <h1 style="color: #A2672D;">Bean Tradition</h1>
+                <p>You requested a password reset. Please click the button below to set a new password:</p>
+                <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background-color: #A2672D; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">Reset Password</a>
+                <p style="margin-top: 20px; font-size: 12px; color: #777;">If you didn't request this, please ignore this email. This link expires in 10 minutes.</p>
+            </div>
+        `;
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'Password Reset - Bean Tradition',
+                message,
+                html
+            });
+
+            res.status(200).json({ message: 'Email sent successfully' });
+        } catch (err) {
+            console.error("Email send error:", err);
+            // Clear token if email fails
+            await supabase
+                .from('users')
+                .update({ reset_password_token: null, reset_password_expires: null })
+                .eq('id', user.id);
+
+            return res.status(500).json({ message: 'Email could not be sent. Please check your SMTP settings.' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// @desc    Reset password
+// @route   PUT /api/users/resetpassword/:resettoken
+// @access  Public
+const resetPassword = async (req, res) => {
+    try {
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(req.params.resettoken)
+            .digest('hex');
+
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('reset_password_token', hashedToken)
+            .gt('reset_password_expires', new Date().toISOString())
+            .single();
+
+        if (error || !user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
+        }
+
+        // Set new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({
+                password: hashedPassword,
+                reset_password_token: null,
+                reset_password_expires: null
+            })
+            .eq('id', user.id);
+
+        if (updateError) {
+            return res.status(500).json({ message: 'Update failed' });
+        }
+
+        res.status(200).json({
+            _id: user.id,
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            token: generateToken(user.id),
+            message: 'Password reset successful'
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+module.exports = { authUser, registerUser, getUserProfile, updateUserProfile, googleLogin, forgotPassword, resetPassword };
