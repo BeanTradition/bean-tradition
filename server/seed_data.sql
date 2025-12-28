@@ -5,7 +5,7 @@ VALUES
   'Indulge in the bold and robust flavor of our Robusta blends, perfect for those who prefer a stronger coffee experience.', 
   '/assets/robusta.jpg',
   'Beans',
-  'Dark',
+  'Medium',
   5,
   'Dark Chocolate & Spice',
   'Strong Espresso & Cold Brew',

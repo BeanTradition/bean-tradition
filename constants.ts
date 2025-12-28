@@ -29,7 +29,7 @@ export const PRODUCTS: Product[] = [
     image: "/assets/robusta.jpg",
     tags: ["Bold", "Robust", "Strong Experience"],
     intensity: 5,
-    roast: "Dark",
+    roast: "Medium",
     category: "Beans",
     tastingNotes: "Dark Chocolate & Spice",
     bestFor: "Strong Espresso & Cold Brew",

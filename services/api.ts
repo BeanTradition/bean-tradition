@@ -116,6 +116,11 @@ export const deleteProduct = async (id: string): Promise<void> => {
     await api.delete(`/products/${id}`);
 };
 
+export const createProduct = async (product: any): Promise<Product> => {
+    const { data } = await api.post('/products', product);
+    return data;
+};
+
 export const forgotPassword = async (email: string) => {
     const { data } = await api.post('/users/forgotpassword', { email });
     return data;

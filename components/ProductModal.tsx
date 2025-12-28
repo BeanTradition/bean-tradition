@@ -125,7 +125,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
                 </div>
               </div>
 
-              {/* Tasting Notes & Best For - Premium Card Style */}
+              {/* Tasting Notes & Best For - Premium Card Style (Hidden)
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-8">
                 <div className="bg-coffee-50/30 p-4 md:p-5 rounded-sm border border-coffee-100 flex flex-col gap-1.5 group/note hover:bg-white hover:border-gold-300 transition-all duration-300">
                   <span className="text-[10px] font-bold text-gold-600 uppercase tracking-[0.2em] mb-1 opacity-80">Flavor Profile</span>
@@ -140,6 +140,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
                   </span>
                 </div>
               </div>
+              */}
 
               <div className="flex flex-col sm:flex-row items-center justify-between mt-auto pt-6 md:pt-8 border-t border-gray-100 gap-6 sm:gap-0">
                 <div className="text-center sm:text-left w-full sm:w-auto">
