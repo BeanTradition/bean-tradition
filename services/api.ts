@@ -2,7 +2,7 @@ import axios from 'axios';
 import { User, Product, Order, CartItem, UserDetails } from '../types';
 
 // @ts-ignore
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Create axios instance with token
 const api = axios.create({
