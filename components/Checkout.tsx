@@ -55,7 +55,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
       const orderCreationData = await createRazorpayOrder(total);
 
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_RvLe2x5GSSgUGN", // Set the fallback if needed or let env handle it
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: orderCreationData.amount,
         currency: "INR",
         name: "Bean Tradition",
