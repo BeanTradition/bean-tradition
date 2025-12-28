@@ -47,15 +47,25 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) return;
+    const rzpKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
+    if (!rzpKey) {
+      alert("Razorpay Key ID is missing. Please check your environment variables.");
+      setIsProcessing(false);
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
       const { createRazorpayOrder, verifyRazorpayPayment, createOrder } = await import('../services/api');
 
+      console.log("Creating Razorpay order for amount:", total);
       const orderCreationData = await createRazorpayOrder(total);
+      console.log("Order created successfully:", orderCreationData);
 
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        key: rzpKey,
         amount: orderCreationData.amount,
         currency: "INR",
         name: "Bean Tradition",
@@ -135,8 +145,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
           }
         },
         modal: {
-          ondismiss: function () {
-            setIsProcessing(false);
+          ondismiss: () => {
+            console.log("Checkout modal closed");
+            // Small delay to ensure state update follows modal animation
+            setTimeout(() => setIsProcessing(false), 200);
           },
           backdropclose: false,
           escape: true
