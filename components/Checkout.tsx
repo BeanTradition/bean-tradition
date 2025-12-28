@@ -63,10 +63,12 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
       console.log("Creating Razorpay order for amount:", total);
       const orderCreationData = await createRazorpayOrder(total);
       console.log("Order created successfully:", orderCreationData);
+      console.log("Using Razorpay Key:", rzpKey ? `${rzpKey.substring(0, 8)}...` : "MISSING");
+      console.log("Frontend Key ID Length:", rzpKey?.length);
 
       const options = {
         key: rzpKey,
-        amount: orderCreationData.amount,
+        amount: orderCreationData.amount || (total * 100),
         currency: "INR",
         name: "Bean Tradition",
         description: "Premium Coffee Order",
