@@ -138,7 +138,6 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
 
                 <div className="flex items-center justify-between mt-auto pt-3 md:pt-6 border-t border-gray-100 group-hover:border-gold-100 transition-colors">
                   <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{product.variants[0].price}</span>
-                  <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{product.variants[0].price}</span>
 
                   {/* Inline Quantity Control for Shop Mode */}
                   {mode === 'shop' && cart && onQuickAdd && onUpdateQuantity ? (
