@@ -62,7 +62,7 @@ export const Hero: React.FC<HeroProps> = ({ onShopNow }) => {
         <div className="overflow-hidden mb-8 md:mb-12 py-2 md:py-4 px-4 md:px-8">
           <div className="animate-slide-up-reveal" style={{ animationDelay: '0.4s' }}>
             <h1 className="text-5xl md:text-8xl lg:text-[9rem] font-serif font-bold leading-[0.9] drop-shadow-2xl px-2">
-              Bean <span className="italic font-light text-coffee-100 border-b-2 border-gold-500/30">Tradition</span>
+              Bean <span className="text-coffee-100 border-b-2 border-gold-500/30">Tradition</span>
             </h1>
           </div>
         </div>
