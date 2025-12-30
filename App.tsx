@@ -208,7 +208,14 @@ function App() {
             </div>
           </div>
           <div className="flex-grow">
-            <ProductList mode="shop" onProductClick={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} onAddToCart={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} />
+            <ProductList
+              mode="shop"
+              cart={cart}
+              onProductClick={(p) => { setSelectedProduct(p); setIsModalOpen(true); }}
+              onAddToCart={(p) => { setSelectedProduct(p); setIsModalOpen(true); }}
+              onUpdateQuantity={updateQuantityComposite}
+              onQuickAdd={(p, v) => addToCart({ ...p, selectedVariant: v, quantity: 1 })}
+            />
           </div>
           <Footer />
         </div>

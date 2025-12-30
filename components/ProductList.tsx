@@ -1,16 +1,19 @@
 
 import React, { useState } from 'react';
 import { PRODUCTS } from '../constants';
-import { Product } from '../types';
+import { Product, CartItem, ProductVariant } from '../types';
 
 interface ProductListProps {
   mode: 'home' | 'shop';
   onProductClick: (product: Product) => void;
-  onAddToCart: (product: Product) => void;
+  onAddToCart?: (product: Product) => void;
   onNavigateToShop?: () => void;
+  cart?: CartItem[];
+  onQuickAdd?: (product: Product, variant: ProductVariant) => void;
+  onUpdateQuantity?: (compositeId: string, delta: number) => void;
 }
 
-export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, onAddToCart, onNavigateToShop }) => {
+export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, onAddToCart, onNavigateToShop, cart, onQuickAdd, onUpdateQuantity }) => {
   const [activeCategory, setActiveCategory] = useState<string>('All');
 
   // Updated Categories based on new product lineup
@@ -135,18 +138,64 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
 
                 <div className="flex items-center justify-between mt-auto pt-3 md:pt-6 border-t border-gray-100 group-hover:border-gold-100 transition-colors">
                   <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{product.variants[0].price}</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCardClick(product);
-                    }}
-                    className="hidden sm:flex text-sm font-bold uppercase tracking-widest text-coffee-900 hover:text-gold-600 transition-colors items-center gap-2 group/btn"
-                  >
-                    {mode === 'home' ? 'View' : 'Select'}
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </button>
+                  <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{product.variants[0].price}</span>
+
+                  {/* Inline Quantity Control for Shop Mode */}
+                  {mode === 'shop' && cart && onQuickAdd && onUpdateQuantity ? (
+                    (() => {
+                      const defaultVariant = product.variants[0];
+                      const cartItem = cart.find(item => item.id === product.id && item.selectedVariant.weight === defaultVariant.weight);
+
+                      if (cartItem) {
+                        return (
+                          <div className="flex items-center gap-3 bg-coffee-100 rounded-full px-2 py-1" onClick={e => e.stopPropagation()}>
+                            <button
+                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, -1)}
+                              className="w-6 h-6 flex items-center justify-center bg-white rounded-full text-coffee-900 hover:bg-coffee-200 transition-colors shadow-sm font-bold pb-0.5"
+                            >
+                              -
+                            </button>
+                            <span className="font-bold text-coffee-900 text-sm min-w-[1.5rem] text-center">{cartItem.quantity}</span>
+                            <button
+                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, 1)}
+                              className="w-6 h-6 flex items-center justify-center bg-coffee-900 rounded-full text-white hover:bg-coffee-800 transition-colors shadow-sm font-bold pb-0.5"
+                            >
+                              +
+                            </button>
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onQuickAdd(product, defaultVariant);
+                            }}
+                            className="hidden sm:flex text-sm font-bold uppercase tracking-widest text-white bg-coffee-900 px-4 py-2 rounded-full hover:bg-gold-600 transition-colors items-center gap-2 shadow-md hover:shadow-lg"
+                          >
+                            Add
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        );
+                      }
+                    })()
+                  ) : (
+                    /* Default View / Select Button */
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCardClick(product);
+                      }}
+                      className="hidden sm:flex text-sm font-bold uppercase tracking-widest text-coffee-900 hover:text-gold-600 transition-colors items-center gap-2 group/btn"
+                    >
+                      {mode === 'home' ? 'View' : 'Select'}
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
