@@ -12,7 +12,7 @@ VALUES
   100,
   12,
   ARRAY['Bold', 'Robust', 'Strong Experience'],
-  '[{"weight": "250gm", "price": 399}]'::jsonb
+  '[{"weight": "250gm", "price": 499}]'::jsonb
 ),
 (
   'Arabica Coffee Beans', 
@@ -26,7 +26,7 @@ VALUES
   150,
   8,
   ARRAY['Delicate', 'Floral', 'Subtle Sweetness'],
-  '[{"weight": "250gm", "price": 499}]'::jsonb
+  '[{"weight": "250gm", "price": 599}]'::jsonb
 ),
 (
   'Filter Coffee Powder', 
@@ -40,7 +40,7 @@ VALUES
   200,
   45,
   ARRAY['Rich Aroma', 'Classic', 'Robust Flavor'],
-  '[{"weight": "250gm", "price": 299}]'::jsonb
+  '[{"weight": "250gm", "price": 399}]'::jsonb
 ),
 (
   'Instant Coffee Powder', 
@@ -54,5 +54,5 @@ VALUES
   300,
   20,
   ARRAY['Quick', 'Convenient', 'Expertly Blended'],
-  '[{"weight": "200gm", "price": 399}]'::jsonb
+  '[{"weight": "200gm", "price": 499}]'::jsonb
 );

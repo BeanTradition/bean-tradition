@@ -34,7 +34,7 @@ export const PRODUCTS: Product[] = [
     tastingNotes: "Dark Chocolate & Spice",
     bestFor: "Strong Espresso & Cold Brew",
     variants: [
-      { weight: "250gm", price: 399 },
+      { weight: "250gm", price: 499 },
       /* 
          Future Variants:
          { weight: "500gm", price: 749 },
@@ -54,7 +54,7 @@ export const PRODUCTS: Product[] = [
     tastingNotes: "Caramel & Berries",
     bestFor: "Pour Over, French Press & Black Coffee",
     variants: [
-      { weight: "250gm", price: 499 },
+      { weight: "250gm", price: 599 },
       /* 
          Future Variants:
          { weight: "500gm", price: 949 },
@@ -74,7 +74,7 @@ export const PRODUCTS: Product[] = [
     tastingNotes: "Bold Cocoa & Chicory",
     bestFor: "Traditional South Indian Filter",
     variants: [
-      { weight: "250gm", price: 299 },
+      { weight: "250gm", price: 399 },
       /* 
          Future Variants:
          { weight: "500gm", price: 549 },
@@ -94,7 +94,7 @@ export const PRODUCTS: Product[] = [
     tastingNotes: "Nutty & Smooth",
     bestFor: "Traveling & Quick Hot/Cold Coffee",
     variants: [
-      { weight: "200gm", price: 399 },
+      { weight: "200gm", price: 499 },
       /* 
          Future Variants:
          { weight: "50gm", price: 120 },
