@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart, onNavigat
   };
 
   const handleWhatsAppClick = () => {
-    window.open("https://wa.me/919985802734", "_blank", "noopener,noreferrer");
+    window.open("https://wa.me/917075852734", "_blank", "noopener,noreferrer");
   };
 
   return (

@@ -117,8 +117,8 @@ function App() {
         <div className="flex justify-center gap-6 text-sm uppercase tracking-widest opacity-60 items-center">
           <a href="https://mail.google.com/mail/?view=cm&fs=1&to=beantradition@gmail.com" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">Email</a>
           <a href="https://www.instagram.com/beantradition/" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">Instagram</a>
-          <a href="https://wa.me/919985802734" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors flex items-center gap-1">
-            <span>+91-9985802734</span>
+          <a href="https://wa.me/917075852734" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors flex items-center gap-1">
+            <span>+91-7075852734</span>
           </a>
         </div>
         <div className="mt-8 pt-8 border-t border-white/10 flex flex-col items-center gap-2">

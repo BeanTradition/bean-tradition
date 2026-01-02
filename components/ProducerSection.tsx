@@ -68,7 +68,7 @@ export const ProducerSection: React.FC = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-white">WhatsApp</h4>
-                                        <a href="https://wa.me/919985802734" target="_blank" rel="noreferrer" className="text-coffee-300 hover:text-gold-400 transition-colors">+91 99858 02734</a>
+                                        <a href="https://wa.me/917075852734" target="_blank" rel="noreferrer" className="text-coffee-300 hover:text-gold-400 transition-colors">+91-7075852734</a>
                                     </div>
                                 </div>
                             </div>
