@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, Product, Order, CartItem, UserDetails } from '../types';
+import { User, Product, Order, CartItem, UserDetails, Coupon } from '../types';
 
 // @ts-ignore
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -138,5 +138,30 @@ export const sendQuery = async (queryData: { name: string, email: string, type: 
 
 export const getAllQueries = async () => {
     const { data } = await api.get('/queries');
+    return data;
+};
+
+// Coupons
+export const getCoupons = async (): Promise<Coupon[]> => {
+    const { data } = await api.get('/coupons');
+    return data;
+};
+
+export const createCoupon = async (couponData: Partial<Coupon>): Promise<Coupon> => {
+    const { data } = await api.post('/coupons', couponData);
+    return data;
+};
+
+export const updateCouponStatus = async (id: string, isActive: boolean): Promise<Coupon> => {
+    const { data } = await api.put(`/coupons/${id}`, { isActive });
+    return data;
+};
+
+export const deleteCoupon = async (id: string): Promise<void> => {
+    await api.delete(`/coupons/${id}`);
+};
+
+export const validateCoupon = async (code: string): Promise<{ valid: boolean, discountType: 'PERCENTAGE' | 'FIXED', discountValue: number, code: string }> => {
+    const { data } = await api.post('/coupons/validate', { code });
     return data;
 };

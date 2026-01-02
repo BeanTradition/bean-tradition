@@ -1,7 +1,18 @@
-
 export interface ProductVariant {
   weight: string;
   price: number;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discountType: 'PERCENTAGE' | 'FIXED';
+  discountValue: number;
+  expirationDate?: string;
+  usageLimit?: number | null; // null = unlimited
+  usageCount: number;
+  isActive: boolean;
+  created_at?: string;
 }
 
 export interface Product {

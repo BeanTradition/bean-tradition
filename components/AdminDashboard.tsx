@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import { getAllOrders, fetchProducts, deleteProduct as apiDeleteProduct, createProduct } from '../services/api';
-import { Order, Product } from '../types';
+import { getAllOrders, fetchProducts, deleteProduct as apiDeleteProduct, createProduct, getCoupons, createCoupon, updateCouponStatus, deleteCoupon as apiDeleteCoupon } from '../services/api';
+import { Order, Product, Coupon } from '../types';
 
 interface AdminDashboardProps {
     onBack: () => void;
@@ -11,7 +11,8 @@ interface AdminDashboardProps {
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout }) => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
-    const [activeTab, setActiveTab] = useState<'orders' | 'products'>('orders');
+    const [coupons, setCoupons] = useState<Coupon[]>([]);
+    const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'coupons'>('orders');
     const [loading, setLoading] = useState(true);
     const [isAddingProduct, setIsAddingProduct] = useState(false);
     const [newProduct, setNewProduct] = useState({
@@ -27,6 +28,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
         variants: [{ weight: '250gm', price: 0 }]
     });
 
+    // Coupon Form State
+    const [isAddingCoupon, setIsAddingCoupon] = useState(false);
+    const [newCoupon, setNewCoupon] = useState({
+        code: '',
+        discountType: 'PERCENTAGE',
+        discountValue: 0,
+        expirationDate: '',
+        usageLimitType: 'unlimited', // UI helper
+        usageLimitAmount: 1
+    });
+
     useEffect(() => {
         loadData();
     }, []);
@@ -34,12 +46,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
     const loadData = async () => {
         setLoading(true);
         try {
-            const [ordersData, productsData] = await Promise.all([
+            const [ordersData, productsData, couponsData] = await Promise.all([
                 getAllOrders(),
-                fetchProducts()
+                fetchProducts(),
+                getCoupons()
             ]);
             setOrders(ordersData);
             setProducts(productsData);
+            setCoupons(couponsData);
         } catch (error) {
             console.error(error);
             alert("Failed to load admin data");
@@ -108,6 +122,55 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
         }
     };
 
+    const handleCreateCoupon = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const couponToCreate: Partial<Coupon> = {
+                code: newCoupon.code,
+                discountType: newCoupon.discountType as 'PERCENTAGE' | 'FIXED',
+                discountValue: Number(newCoupon.discountValue),
+                expirationDate: newCoupon.expirationDate || undefined,
+                usageLimit: newCoupon.usageLimitType === 'unlimited' ? null : Number(newCoupon.usageLimitAmount),
+                isActive: true
+            };
+            const created = await createCoupon(couponToCreate);
+            setCoupons(prev => [created, ...prev]);
+            setIsAddingCoupon(false);
+            setNewCoupon({
+                code: '',
+                discountType: 'PERCENTAGE',
+                discountValue: 0,
+                expirationDate: '',
+                usageLimitType: 'unlimited',
+                usageLimitAmount: 1
+            });
+        } catch (error) {
+            console.error(error);
+            alert("Failed to create coupon");
+        }
+    };
+
+    const handleToggleCoupon = async (id: string, currentStatus: boolean) => {
+        try {
+            const updated = await updateCouponStatus(id, !currentStatus);
+            setCoupons(prev => prev.map(c => c.id === id ? updated : c));
+        } catch (error) {
+            console.error(error);
+            alert("Failed to update coupon");
+        }
+    };
+
+    const handleDeleteCoupon = async (id: string) => {
+        if (!window.confirm("Are you sure?")) return;
+        try {
+            await apiDeleteCoupon(id);
+            setCoupons(prev => prev.filter(c => c.id !== id));
+        } catch (error) {
+            console.error(error);
+            alert("Failed to delete coupon");
+        }
+    };
+
     if (loading) return <div className="text-center py-20">Loading Admin Dashboard...</div>;
 
     return (
@@ -137,6 +200,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                         className={`px-6 py-3 rounded-lg font-bold ${activeTab === 'products' ? 'bg-coffee-900 text-white' : 'bg-white text-coffee-900'}`}
                     >
                         Products ({products.length})
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('coupons')}
+                        className={`px-6 py-3 rounded-lg font-bold ${activeTab === 'coupons' ? 'bg-coffee-900 text-white' : 'bg-white text-coffee-900'}`}
+                    >
+                        Coupons ({coupons.length})
                     </button>
                 </div>
 
@@ -240,7 +309,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                     </div>
                 )}
 
-                {activeTab === 'orders' ? (
+                {activeTab === 'orders' && (
                     <div className="bg-white rounded-xl shadow overflow-hidden">
                         <table className="w-full text-left">
                             <thead className="bg-coffee-50 border-b">
@@ -289,7 +358,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                             </tbody>
                         </table>
                     </div>
-                ) : (
+                )}
+
+                {activeTab === 'products' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* New Product Toggle Card */}
                         {!isAddingProduct && (
@@ -322,6 +393,123 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                 </div>
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {activeTab === 'coupons' && (
+                    <div>
+                        {/* Add Coupon Button */}
+                        {!isAddingCoupon && (
+                            <button
+                                onClick={() => setIsAddingCoupon(true)}
+                                className="mb-6 bg-coffee-900 text-white px-6 py-3 rounded-lg font-bold uppercase tracking-widest hover:bg-gold-600 transition-colors shadow-lg flex items-center gap-2"
+                            >
+                                <span className="text-xl">+</span> Create New Coupon
+                            </button>
+                        )}
+
+                        {/* Create Coupon Form */}
+                        {isAddingCoupon && (
+                            <div className="bg-white rounded-xl shadow-lg p-8 mb-8 animate-fade-in border-t-4 border-gold-500 max-w-2xl">
+                                <h3 className="text-xl font-bold mb-6 text-coffee-900">Create New Coupon</h3>
+                                <form onSubmit={handleCreateCoupon} className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Coupon Code</label>
+                                        <input required type="text" className="w-full border p-3 rounded uppercase font-mono" placeholder="SUMMER25" value={newCoupon.code} onChange={e => setNewCoupon({ ...newCoupon, code: e.target.value })} />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Type</label>
+                                            <select className="w-full border p-3 rounded" value={newCoupon.discountType} onChange={e => setNewCoupon({ ...newCoupon, discountType: e.target.value })}>
+                                                <option value="PERCENTAGE">Percentage (%)</option>
+                                                <option value="FIXED">Fixed Amount (₹)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Value</label>
+                                            <input required type="number" className="w-full border p-3 rounded" value={newCoupon.discountValue} onChange={e => setNewCoupon({ ...newCoupon, discountValue: Number(e.target.value) })} />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Usage Limit</label>
+                                            <select className="w-full border p-3 rounded" value={newCoupon.usageLimitType} onChange={e => setNewCoupon({ ...newCoupon, usageLimitType: e.target.value })}>
+                                                <option value="unlimited">Unlimited (Multi-use)</option>
+                                                <option value="limited">Limited (Set Count)</option>
+                                            </select>
+                                        </div>
+                                        {newCoupon.usageLimitType === 'limited' && (
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Count</label>
+                                                <input type="number" min="1" className="w-full border p-3 rounded" value={newCoupon.usageLimitAmount} onChange={e => setNewCoupon({ ...newCoupon, usageLimitAmount: Number(e.target.value) })} />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Expiration Date (Optional)</label>
+                                        <input type="date" className="w-full border p-3 rounded" value={newCoupon.expirationDate} onChange={e => setNewCoupon({ ...newCoupon, expirationDate: e.target.value })} />
+                                    </div>
+                                    <div className="flex gap-4 pt-4">
+                                        <button type="submit" className="flex-1 bg-coffee-900 text-white py-3 rounded font-bold">Create</button>
+                                        <button type="button" onClick={() => setIsAddingCoupon(false)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-bold">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
+                        {/* Coupons Table */}
+                        <div className="bg-white rounded-xl shadow overflow-hidden">
+                            <table className="w-full text-left">
+                                <thead className="bg-coffee-50 border-b">
+                                    <tr>
+                                        <th className="p-4">Code</th>
+                                        <th className="p-4">Discount</th>
+                                        <th className="p-4">Limit</th>
+                                        <th className="p-4">Used</th>
+                                        <th className="p-4">Expiry</th>
+                                        <th className="p-4">Status</th>
+                                        <th className="p-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y">
+                                    {coupons.map(coupon => (
+                                        <tr key={coupon.id} className="hover:bg-gray-50">
+                                            <td className="p-4 font-mono font-bold text-coffee-900">{coupon.code}</td>
+                                            <td className="p-4 font-bold text-gold-600">
+                                                {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}%` : `₹${coupon.discountValue}`}
+                                            </td>
+                                            <td className="p-4 text-sm">{coupon.usageLimit === null ? '∞' : coupon.usageLimit}</td>
+                                            <td className="p-4 text-sm">{coupon.usageCount}</td>
+                                            <td className="p-4 text-sm text-gray-500">{coupon.expirationDate ? new Date(coupon.expirationDate).toLocaleDateString() : '-'}</td>
+                                            <td className="p-4">
+                                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${coupon.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                    {coupon.isActive ? 'Active' : 'Disabled'}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 flex gap-2">
+                                                <button
+                                                    onClick={() => handleToggleCoupon(coupon.id, coupon.isActive)}
+                                                    className="text-xs font-bold underline text-blue-600"
+                                                >
+                                                    {coupon.isActive ? 'Disable' : 'Enable'}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteCoupon(coupon.id)}
+                                                    className="text-xs font-bold underline text-red-600"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {coupons.length === 0 && (
+                                        <tr>
+                                            <td colSpan={7} className="p-8 text-center text-gray-500">No coupons created yet.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>

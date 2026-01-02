@@ -10,6 +10,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const queryRoutes = require('./routes/queryRoutes');
+const couponRoutes = require('./routes/couponRoutes');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/queries', queryRoutes);
+app.use('/api/coupons', couponRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');

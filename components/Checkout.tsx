@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { CartItem, UserDetails, Order, User } from '../types';
+import { validateCoupon } from '../services/api';
 
 interface CheckoutProps {
   cart: CartItem[];
@@ -14,6 +14,12 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
     name: '', phone: '', email: '', address: '', city: '', pincode: ''
   });
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Coupon State
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string, type: 'PERCENTAGE' | 'FIXED', value: number } | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -30,10 +36,51 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
 
   const subtotal = cart.reduce((acc, item) => acc + (item.selectedVariant.price * item.quantity), 0);
   const shipping = subtotal >= 499 ? 0 : 100;
-  const total = subtotal + shipping;
+
+  // Calculate Discount
+  let discountAmount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.type === 'PERCENTAGE') {
+      discountAmount = Math.round((subtotal * appliedCoupon.value) / 100);
+    } else {
+      discountAmount = appliedCoupon.value;
+    }
+    // Prevent negative total
+    const maxDiscount = subtotal; // Can discount up to subtotal (shipping is usually separate, but let's say max discount is subtotal)
+    if (discountAmount > maxDiscount) discountAmount = maxDiscount;
+  }
+
+  const total = subtotal + shipping - discountAmount;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setIsValidatingCoupon(true);
+    setCouponError('');
+    try {
+      const result = await validateCoupon(couponCode);
+      if (result.valid) {
+        setAppliedCoupon({
+          code: result.code,
+          type: result.discountType,
+          value: result.discountValue
+        });
+        setCouponCode(''); // Clear input
+      }
+    } catch (error: any) {
+      console.error(error);
+      setAppliedCoupon(null);
+      setCouponError(error.response?.data?.message || 'Invalid Coupon');
+    }
+    setIsValidatingCoupon(false);
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError('');
   };
 
   // Force Login Check
@@ -62,9 +109,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
 
       console.log("Creating Razorpay order for amount:", total);
       const orderCreationData = await createRazorpayOrder(total);
-      console.log("ORDER DATA IN FRONTEND:", JSON.stringify(orderCreationData, null, 2));
-      console.log("Using Razorpay Key:", rzpKey ? `${rzpKey.substring(0, 8)}...` : "MISSING");
-      console.log("Frontend Key ID Length:", rzpKey?.length);
 
       const options = {
         key: rzpKey,
@@ -109,7 +153,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
                   id: response.razorpay_payment_id,
                   status: 'paid',
                   update_time: new Date().toISOString(),
-                  email_address: formData.email
+                  email_address: formData.email,
+                  coupon_applied: appliedCoupon ? appliedCoupon.code : null
                 }
               };
 
@@ -138,21 +183,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
           enabled: true,
           max_count: 3
         },
-        remember_customer: true,
-        config: {
-          display: {
-            preferences: {
-              show_default_blocks: true,
-            }
-          }
-        },
         modal: {
           ondismiss: () => {
-            console.log("Checkout modal closed");
-            // Small delay to ensure state update follows modal animation
             setTimeout(() => setIsProcessing(false), 200);
           },
-          backdropclose: false,
           escape: true
         }
       };
@@ -160,9 +194,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
       // @ts-ignore
       const rzp1 = new window.Razorpay(options);
       rzp1.on("payment.failed", function (response: any) {
-        console.error("Payment failed", response.error);
-        alert(`Payment Failed: ${response.error.description || "Something went wrong"}`);
         setIsProcessing(false);
+        alert("Payment Failed");
       });
       rzp1.open();
 
@@ -241,9 +274,49 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
               </div>
             ))}
           </div>
+
+          {/* Coupon Section */}
+          <div className="py-4 border-t border-gray-100">
+            {appliedCoupon ? (
+              <div className="bg-green-50 border border-green-200 p-3 rounded flex justify-between items-center">
+                <div>
+                  <span className="text-green-800 font-bold text-sm block">Coupon Applied</span>
+                  <span className="text-green-600 text-xs">{appliedCoupon.code}</span>
+                </div>
+                <button onClick={removeCoupon} className="text-red-500 text-xs font-bold hover:underline">Remove</button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Coupon Code"
+                  className="flex-1 border border-gray-300 p-2 rounded text-sm uppercase font-mono"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                />
+                <button
+                  onClick={handleApplyCoupon}
+                  disabled={isValidatingCoupon || !couponCode}
+                  className="bg-coffee-800 text-white px-4 py-2 rounded text-xs font-bold uppercase tracking-widest disabled:opacity-50"
+                >
+                  {isValidatingCoupon ? '...' : 'Apply'}
+                </button>
+              </div>
+            )}
+            {couponError && <p className="text-red-500 text-xs mt-2">{couponError}</p>}
+          </div>
+
           <div className="border-t border-gray-100 pt-4 space-y-2">
             <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>₹{subtotal}</span></div>
             <div className="flex justify-between text-gray-600"><span>Shipping</span><span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span></div>
+
+            {appliedCoupon && (
+              <div className="flex justify-between text-green-700 font-bold">
+                <span>Discount</span>
+                <span>- ₹{discountAmount}</span>
+              </div>
+            )}
+
             {shipping > 0 && (
               <p className="text-[10px] text-gold-600 font-bold text-right italic">+ Add ₹{499 - subtotal} more for Free Delivery</p>
             )}
