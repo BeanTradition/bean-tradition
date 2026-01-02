@@ -118,29 +118,57 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
               </div>
 
               <div className="p-4 md:p-8 flex flex-col flex-grow bg-white relative">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (mode === 'home' && onNavigateToShop) {
-                      onNavigateToShop();
-                    } else if (mode === 'shop' && onQuickAdd) {
-                      const defaultVariant = product.variants[0];
-                      onQuickAdd(product, defaultVariant);
+                {/* Floating Action Button / Quantity Control */}
+                {mode === 'shop' && cart && onUpdateQuantity ? (
+                  (() => {
+                    const defaultVariant = product.variants[0];
+                    const cartItem = cart.find(item => item.id === product.id && item.selectedVariant.weight === defaultVariant.weight);
+
+                    if (cartItem) {
+                      return (
+                        <div
+                          className="absolute -top-4 right-4 md:-top-6 md:right-8 bg-coffee-900 rounded-full shadow-lg flex items-center border-2 border-white z-10 overflow-hidden h-8 md:h-12 animate-fade-in"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, -1)}
+                            className="w-8 md:w-12 h-full flex items-center justify-center text-white hover:bg-white/20 transition-colors font-bold text-lg pb-1"
+                          >
+                            -
+                          </button>
+                          <span className="font-bold text-gold-400 text-sm md:text-base min-w-[1.5rem] text-center">{cartItem.quantity}</span>
+                          <button
+                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, 1)}
+                            className="w-8 md:w-12 h-full flex items-center justify-center text-white hover:bg-white/20 transition-colors font-bold text-lg pb-1"
+                          >
+                            +
+                          </button>
+                        </div>
+                      );
                     }
-                  }}
-                  className={`absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 ${mode === 'shop' && cart?.find(item => item.id === product.id && item.selectedVariant.weight === product.variants[0].weight)
-                      ? 'bg-coffee-900 text-gold-400 scale-110 ring-4 ring-white/50'
-                      : 'bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110'
-                    }`}
-                >
-                  {mode === 'home' ? '→' : (
-                    (() => {
-                      const defaultVariant = product.variants[0];
-                      const cartItem = cart?.find(item => item.id === product.id && item.selectedVariant.weight === defaultVariant.weight);
-                      return cartItem ? cartItem.quantity : '+';
-                    })()
-                  )}
-                </button>
+                    return (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onQuickAdd) onQuickAdd(product, defaultVariant);
+                        }}
+                        className="absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110"
+                      >
+                        +
+                      </button>
+                    );
+                  })()
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onNavigateToShop) onNavigateToShop();
+                    }}
+                    className="absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110"
+                  >
+                    →
+                  </button>
+                )}
 
                 <div className="mb-2 hidden md:block">
                   {product.tags.slice(0, 2).map(tag => (
