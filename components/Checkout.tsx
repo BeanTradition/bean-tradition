@@ -135,6 +135,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
                   image: item.image,
                   price: item.selectedVariant.price,
                   weight: item.selectedVariant.weight,
+                  roast: item.selectedRoast,
+                  intensity: item.selectedIntensity,
                   product: item._id || item.id
                 })),
                 shippingAddress: {
@@ -267,7 +269,11 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
                   <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-sm" />
                   <div>
                     <span className="text-coffee-900 font-medium block">{item.name}</span>
-                    <span className="text-xs text-gray-500">{item.selectedVariant.weight} x {item.quantity}</span>
+                    <span className="text-xs text-gray-500">
+                      {item.selectedVariant.weight} x {item.quantity}
+                      {item.selectedRoast && <span className="ml-1">• {item.selectedRoast} Roast</span>}
+                      {item.selectedIntensity && <span className="ml-1">• {item.selectedIntensity} Intensity</span>}
+                    </span>
                   </div>
                 </div>
                 <span className="text-coffee-900 font-bold">₹{item.selectedVariant.price * item.quantity}</span>

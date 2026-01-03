@@ -76,11 +76,17 @@ function App() {
   const addToCart = (newItem: CartItem) => {
     setCart(prev => {
       const existing = prev.find(item =>
-        item.id === newItem.id && item.selectedVariant.weight === newItem.selectedVariant.weight
+        item.id === newItem.id &&
+        item.selectedVariant.weight === newItem.selectedVariant.weight &&
+        item.selectedRoast === newItem.selectedRoast &&
+        item.selectedIntensity === newItem.selectedIntensity
       );
       if (existing) {
         return prev.map(item =>
-          (item.id === newItem.id && item.selectedVariant.weight === newItem.selectedVariant.weight)
+          (item.id === newItem.id &&
+            item.selectedVariant.weight === newItem.selectedVariant.weight &&
+            item.selectedRoast === newItem.selectedRoast &&
+            item.selectedIntensity === newItem.selectedIntensity)
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
         );
@@ -91,7 +97,9 @@ function App() {
 
   const updateQuantityComposite = (compositeId: string, delta: number) => {
     setCart(prev => prev.map(item => {
-      const key = `${item.id}-${item.selectedVariant.weight}`;
+      // Valid ID Format: id-weight-roast-intensity
+      // However, roast/intensity might be undefined/empty.
+      const key = `${item.id}-${item.selectedVariant.weight}-${item.selectedRoast || ''}-${item.selectedIntensity || ''}`;
       if (key === compositeId) {
         return { ...item, quantity: Math.max(0, item.quantity + delta) };
       }
@@ -100,7 +108,7 @@ function App() {
   }
 
   const removeItemComposite = (compositeId: string) => {
-    setCart(prev => prev.filter(item => `${item.id}-${item.selectedVariant.weight}` !== compositeId));
+    setCart(prev => prev.filter(item => `${item.id}-${item.selectedVariant.weight}-${item.selectedRoast || ''}-${item.selectedIntensity || ''}` !== compositeId));
   }
 
   const handleCheckoutSuccess = () => {
@@ -214,7 +222,13 @@ function App() {
               onProductClick={(p) => { setSelectedProduct(p); setIsModalOpen(true); }}
               onAddToCart={(p) => { setSelectedProduct(p); setIsModalOpen(true); }}
               onUpdateQuantity={updateQuantityComposite}
-              onQuickAdd={(p, v) => addToCart({ ...p, selectedVariant: v, quantity: 1 })}
+              onQuickAdd={(p, v, opts) => addToCart({
+                ...p,
+                selectedVariant: v,
+                quantity: 1,
+                selectedRoast: opts?.selectedRoast as any,
+                selectedIntensity: opts?.selectedIntensity as any
+              })}
             />
           </div>
           <Footer />
