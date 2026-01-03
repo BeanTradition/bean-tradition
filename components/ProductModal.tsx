@@ -12,14 +12,10 @@ interface ProductModalProps {
 export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose, onAddToCart }) => {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [isAdded, setIsAdded] = useState(false);
-  const [selectedRoast, setSelectedRoast] = useState<'Light' | 'Medium' | 'Dark'>('Medium');
-  const [selectedIntensity, setSelectedIntensity] = useState<'Light' | 'Medium' | 'Strong'>('Medium');
 
   useEffect(() => {
     if (isOpen) {
       setSelectedVariantIndex(0);
-      setSelectedRoast('Medium');
-      setSelectedIntensity('Medium');
       setIsAdded(false);
       // Prevent background scrolling
       document.body.style.overflow = 'hidden';
@@ -39,9 +35,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
     onAddToCart({
       ...product,
       selectedVariant: product.variants[selectedVariantIndex],
-      quantity: 1,
-      selectedRoast: product.category === 'Beans' ? selectedRoast : undefined,
-      selectedIntensity: (product.category === 'Filter Powder' || product.category === 'Instant') ? selectedIntensity : undefined
+      quantity: 1
     });
     setIsAdded(true);
   };
@@ -101,7 +95,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
             <>
               <div className="mb-4 flex items-center justify-between">
                 <span className="inline-block px-4 py-1 bg-coffee-100 text-coffee-800 text-xs font-bold uppercase tracking-widest rounded-full">
-                  {product.category === 'Beans' ? 'Beans' : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
+                  {product.roast} Roast
                 </span>
               </div>
 
@@ -112,49 +106,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
               <p className="text-coffee-700 text-sm md:text-lg leading-relaxed mb-6 md:mb-8 font-light">
                 {product.description}
               </p>
-
-              {/* Customization Selectors */}
-              <div className="mb-6">
-                {product.category === 'Beans' && (
-                  <div className="mb-4">
-                    <label className="block text-sm font-bold text-coffee-900 uppercase tracking-widest mb-3">Select Roast</label>
-                    <div className="flex gap-2">
-                      {['Light', 'Medium', 'Dark'].map(roast => (
-                        <button
-                          key={roast}
-                          onClick={() => setSelectedRoast(roast as any)}
-                          className={`flex-1 px-4 py-3 border rounded-sm transition-all duration-300 font-bold uppercase text-xs ${selectedRoast === roast
-                            ? 'border-coffee-900 bg-coffee-900 text-white shadow-md'
-                            : 'border-coffee-200 text-coffee-600 hover:border-gold-400'
-                            }`}
-                        >
-                          {roast}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {(product.category === 'Filter Powder' || product.category === 'Instant') && (
-                  <div>
-                    <label className="block text-sm font-bold text-coffee-900 uppercase tracking-widest mb-3">Select Intensity</label>
-                    <div className="flex gap-2">
-                      {['Light', 'Medium', 'Strong'].map(intensity => (
-                        <button
-                          key={intensity}
-                          onClick={() => setSelectedIntensity(intensity as any)}
-                          className={`flex-1 px-4 py-3 border rounded-sm transition-all duration-300 font-bold uppercase text-xs ${selectedIntensity === intensity
-                            ? 'border-coffee-900 bg-coffee-900 text-white shadow-md'
-                            : 'border-coffee-200 text-coffee-600 hover:border-gold-400'
-                            }`}
-                        >
-                          {intensity}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
 
               <div className="mb-8">
                 <label className="block text-sm font-bold text-coffee-900 uppercase tracking-widest mb-3">Select Size</label>

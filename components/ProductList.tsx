@@ -9,7 +9,7 @@ interface ProductListProps {
   onAddToCart?: (product: Product) => void;
   onNavigateToShop?: () => void;
   cart?: CartItem[];
-  onQuickAdd?: (product: Product, variant: ProductVariant, customization?: { selectedRoast?: string, selectedIntensity?: string }) => void;
+  onQuickAdd?: (product: Product, variant: ProductVariant) => void;
   onUpdateQuantity?: (compositeId: string, delta: number) => void;
 }
 
@@ -21,7 +21,6 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selections, setSelections] = useState<Record<string, { roast?: string, intensity?: string }>>({});
 
   // Fetch products from backend
   React.useEffect(() => {
@@ -114,7 +113,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
 
                 {/* Badge - Smaller on mobile */}
                 <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white/95 px-2 md:px-4 py-1 md:py-2 text-[8px] md:text-xs font-bold uppercase tracking-tighter md:tracking-widest text-coffee-900 shadow-sm backdrop-blur-sm rounded-sm">
-                  {product.category === 'Beans' ? 'Beans' : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
+                  {product.category === 'Beans' ? `${product.roast} Roast` : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
                 </div>
               </div>
 
@@ -123,18 +122,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 {mode === 'shop' && cart && onUpdateQuantity ? (
                   (() => {
                     const defaultVariant = product.variants[0];
-                    const currentSelection = selections[product.id] || {};
-                    // Determine effective customization
-                    const effectiveRoast = product.category === 'Beans' ? (currentSelection.roast || 'Medium') : undefined;
-                    const effectiveIntensity = (product.category === 'Filter Powder' || product.category === 'Instant') ? (currentSelection.intensity || 'Medium') : undefined;
-
-                    // Composite ID matching
-                    const cartItem = cart.find(item =>
-                      item.id === product.id &&
-                      item.selectedVariant.weight === defaultVariant.weight &&
-                      item.selectedRoast === effectiveRoast &&
-                      item.selectedIntensity === effectiveIntensity
-                    );
+                    const cartItem = cart.find(item => item.id === product.id && item.selectedVariant.weight === defaultVariant.weight);
 
                     if (cartItem) {
                       return (
@@ -143,24 +131,14 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                           onClick={(e) => e.stopPropagation()}
                         >
                           <button
-                            onClick={() => {
-                              // Deleting/Decrementing needs exact match logic which is handled by ID usually, 
-                              // but our composite ID usually just included weight. 
-                              // We need to update checking to support this.
-                              // For now, pass basic update. The App.tsx handles delta.
-                              // Wait, the compositeID in App.tsx is `${item.id}-${item.selectedVariant.weight}`.
-                              // If we have multiple variants of same weight but different roast, this ID collides!
-                              // We likely need to update App.tsx to handle unique keys including roast/intensity.
-                              // But for this single button, let's just trigger update.
-                              onUpdateQuantity(`${product.id}-${defaultVariant.weight}-${effectiveRoast || ''}-${effectiveIntensity || ''}`, -1)
-                            }}
+                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, -1)}
                             className="w-8 md:w-12 h-full flex items-center justify-center text-white hover:bg-white/20 transition-colors font-bold text-lg pb-1"
                           >
                             -
                           </button>
                           <span className="font-bold text-gold-400 text-sm md:text-base min-w-[1.5rem] text-center">{cartItem.quantity}</span>
                           <button
-                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}-${effectiveRoast || ''}-${effectiveIntensity || ''}`, 1)}
+                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, 1)}
                             className="w-8 md:w-12 h-full flex items-center justify-center text-white hover:bg-white/20 transition-colors font-bold text-lg pb-1"
                           >
                             +
@@ -172,10 +150,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (onQuickAdd) onQuickAdd(product, defaultVariant, {
-                            selectedRoast: effectiveRoast,
-                            selectedIntensity: effectiveIntensity
-                          });
+                          if (onQuickAdd) onQuickAdd(product, defaultVariant);
                         }}
                         className="absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110"
                       >
@@ -205,53 +180,9 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                   {product.name}
                 </h3>
 
-                <p className="text-gray-500 text-[10px] md:text-sm leading-tight md:leading-relaxed mb-4 flex-grow font-light line-clamp-2 md:line-clamp-3">
+                <p className="text-gray-500 text-[10px] md:text-sm leading-tight md:leading-relaxed mb-4 md:mb-6 flex-grow font-light line-clamp-2 md:line-clamp-3">
                   {product.description}
                 </p>
-
-                {/* Customization Selectors */}
-                {mode === 'shop' && (
-                  <div className="mb-4" onClick={e => e.stopPropagation()}>
-                    {product.category === 'Beans' && (
-                      <div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">Select Roast</span>
-                        <div className="flex gap-1">
-                          {['Light', 'Medium', 'Dark'].map(roast => (
-                            <button
-                              key={roast}
-                              onClick={() => setSelections(prev => ({ ...prev, [product.id]: { ...prev[product.id], roast: roast } }))}
-                              className={`flex-1 py-1 text-[10px] uppercase font-bold border rounded-sm transition-colors ${(selections[product.id]?.roast || 'Medium') === roast
-                                ? 'bg-coffee-800 text-gold-400 border-coffee-800'
-                                : 'bg-transparent text-gray-400 border-gray-200 hover:border-gold-400 hover:text-gold-600'
-                                }`}
-                            >
-                              {roast}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {(product.category === 'Filter Powder' || product.category === 'Instant') && (
-                      <div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">Select Intensity</span>
-                        <div className="flex gap-1">
-                          {['Light', 'Medium', 'Strong'].map(intensity => (
-                            <button
-                              key={intensity}
-                              onClick={() => setSelections(prev => ({ ...prev, [product.id]: { ...prev[product.id], intensity: intensity } }))}
-                              className={`flex-1 py-1 text-[10px] uppercase font-bold border rounded-sm transition-colors ${(selections[product.id]?.intensity || 'Medium') === intensity
-                                ? 'bg-coffee-800 text-gold-400 border-coffee-800'
-                                : 'bg-transparent text-gray-400 border-gray-200 hover:border-gold-400 hover:text-gold-600'
-                                }`}
-                            >
-                              {intensity}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
 
                 <div className="flex items-center justify-between mt-auto pt-3 md:pt-6 border-t border-gray-100 group-hover:border-gold-100 transition-colors">
                   <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{product.variants[0].price}</span>
@@ -259,29 +190,20 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                   {mode === 'shop' && cart && onUpdateQuantity && onQuickAdd && (
                     (() => {
                       const defaultVariant = product.variants[0];
-                      const currentSelection = selections[product.id] || {};
-                      const effectiveRoast = product.category === 'Beans' ? (currentSelection.roast || 'Medium') : undefined;
-                      const effectiveIntensity = (product.category === 'Filter Powder' || product.category === 'Instant') ? (currentSelection.intensity || 'Medium') : undefined;
-
-                      const cartItem = cart.find(item =>
-                        item.id === product.id &&
-                        item.selectedVariant.weight === defaultVariant.weight &&
-                        item.selectedRoast === effectiveRoast &&
-                        item.selectedIntensity === effectiveIntensity
-                      );
+                      const cartItem = cart.find(item => item.id === product.id && item.selectedVariant.weight === defaultVariant.weight);
 
                       if (cartItem) {
                         return (
                           <div className="flex items-center gap-2 bg-coffee-100 rounded-full px-2 py-1" onClick={e => e.stopPropagation()}>
                             <button
-                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}-${effectiveRoast || ''}-${effectiveIntensity || ''}`, -1)}
+                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, -1)}
                               className="w-6 h-6 flex items-center justify-center bg-white rounded-full text-coffee-900 hover:bg-coffee-200 transition-colors shadow-sm font-bold pb-0.5"
                             >
                               -
                             </button>
                             <span className="font-bold text-coffee-900 text-sm min-w-[1.25rem] text-center">{cartItem.quantity}</span>
                             <button
-                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}-${effectiveRoast || ''}-${effectiveIntensity || ''}`, 1)}
+                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, 1)}
                               className="w-6 h-6 flex items-center justify-center bg-coffee-900 rounded-full text-white hover:bg-coffee-800 transition-colors shadow-sm font-bold pb-0.5"
                             >
                               +
@@ -293,10 +215,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              onQuickAdd(product, defaultVariant, {
-                                selectedRoast: effectiveRoast,
-                                selectedIntensity: effectiveIntensity
-                              });
+                              onQuickAdd(product, defaultVariant);
                             }}
                             className="text-xs font-bold uppercase tracking-widest text-white bg-coffee-900 px-4 py-2 rounded-full hover:bg-gold-600 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
                           >
