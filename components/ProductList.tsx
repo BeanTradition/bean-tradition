@@ -114,7 +114,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
 
                 {/* Badge - Smaller on mobile */}
                 <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white/95 px-2 md:px-4 py-1 md:py-2 text-[8px] md:text-xs font-bold uppercase tracking-tighter md:tracking-widest text-coffee-900 shadow-sm backdrop-blur-sm rounded-sm">
-                  {product.category === 'Beans' ? `${product.roast} Roast` : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
+                  {product.category === 'Beans' ? 'Beans' : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
                 </div>
               </div>
 
@@ -221,8 +221,8 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                               key={roast}
                               onClick={() => setSelections(prev => ({ ...prev, [product.id]: { ...prev[product.id], roast: roast } }))}
                               className={`flex-1 py-1 text-[10px] uppercase font-bold border rounded-sm transition-colors ${(selections[product.id]?.roast || 'Medium') === roast
-                                  ? 'bg-coffee-800 text-gold-400 border-coffee-800'
-                                  : 'bg-transparent text-gray-400 border-gray-200 hover:border-gold-400 hover:text-gold-600'
+                                ? 'bg-coffee-800 text-gold-400 border-coffee-800'
+                                : 'bg-transparent text-gray-400 border-gray-200 hover:border-gold-400 hover:text-gold-600'
                                 }`}
                             >
                               {roast}
@@ -240,8 +240,8 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                               key={intensity}
                               onClick={() => setSelections(prev => ({ ...prev, [product.id]: { ...prev[product.id], intensity: intensity } }))}
                               className={`flex-1 py-1 text-[10px] uppercase font-bold border rounded-sm transition-colors ${(selections[product.id]?.intensity || 'Medium') === intensity
-                                  ? 'bg-coffee-800 text-gold-400 border-coffee-800'
-                                  : 'bg-transparent text-gray-400 border-gray-200 hover:border-gold-400 hover:text-gold-600'
+                                ? 'bg-coffee-800 text-gold-400 border-coffee-800'
+                                : 'bg-transparent text-gray-400 border-gray-200 hover:border-gold-400 hover:text-gold-600'
                                 }`}
                             >
                               {intensity}
