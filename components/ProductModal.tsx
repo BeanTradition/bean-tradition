@@ -95,7 +95,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
             <>
               <div className="mb-4 flex items-center justify-between">
                 <span className="inline-block px-4 py-1 bg-coffee-100 text-coffee-800 text-xs font-bold uppercase tracking-widest rounded-full">
-                  {product.roast} Roast
+                  {product.category === 'Beans' ? 'Beans' : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
                 </span>
               </div>
 
