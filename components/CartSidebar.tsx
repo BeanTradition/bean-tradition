@@ -67,49 +67,55 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
             </div>
           ) : (
             <div className="space-y-6">
-              {items.map((item, idx) => (
-                <div
-                  key={item.id}
-                  className="flex gap-4 border-b border-gray-100 pb-4 animate-slide-in-right"
-                  style={{ animationDelay: `${idx * 100}ms` }}
-                >
-                  <div className="w-20 h-20 bg-gray-100 rounded-sm overflow-hidden flex-shrink-0 relative group">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  </div>
-                  <div className="flex-grow">
-                    <h3 className="font-serif font-bold text-coffee-900">{item.name}</h3>
-                    <p className="text-sm text-gray-500 mb-2">{item.selectedVariant.weight} • {item.roast}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center border border-gray-300 rounded-sm">
-                        <button
-                          onClick={() => onUpdateQuantity(item.id, -1)}
-                          className="px-2 py-1 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors active:scale-75 transform duration-100"
-                        >
-                          -
-                        </button>
+              {items.map((item, idx) => {
+                // Construct composite ID for updating
+                const compositeId = `${item.id}-${item.selectedVariant.weight}-${item.selectedRoast || ''}-${item.selectedIntensity || ''}`;
+                return (
+                  <div
+                    key={compositeId}
+                    className="flex gap-4 border-b border-gray-100 pb-4 animate-slide-in-right"
+                    style={{ animationDelay: `${idx * 100}ms` }}
+                  >
+                    <div className="w-20 h-20 bg-gray-100 rounded-sm overflow-hidden flex-shrink-0 relative group">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="font-serif font-bold text-coffee-900">{item.name}</h3>
+                      <p className="text-sm text-gray-500 mb-2">
+                        {item.selectedVariant.weight}
+                        {item.selectedRoast && <span> • {item.selectedRoast} Roast</span>}
+                        {item.selectedIntensity && <span> • {item.selectedIntensity} Intensity</span>}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center border border-gray-300 rounded-sm">
+                          <button
+                            onClick={() => onUpdateQuantity(compositeId, -1)}
+                            className="px-2 py-1 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors active:scale-75 transform duration-100"
+                          >
+                            -
+                          </button>
+                          <span
+                            className="px-2 text-sm font-bold w-6 text-center animate-pop"
+                          >
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => onUpdateQuantity(compositeId, 1)}
+                            className="px-2 py-1 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors active:scale-75 transform duration-100"
+                          >
+                            +
+                          </button>
+                        </div>
                         <span
-                          key={item.quantity}
-                          className="px-2 text-sm font-bold w-6 text-center animate-pop"
+                          key={item.quantity * item.selectedVariant.price}
+                          className="font-bold text-coffee-800 animate-fade-in"
                         >
-                          {item.quantity}
+                          ₹{item.selectedVariant.price * item.quantity}
                         </span>
-                        <button
-                          onClick={() => onUpdateQuantity(item.id, 1)}
-                          className="px-2 py-1 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors active:scale-75 transform duration-100"
-                        >
-                          +
-                        </button>
                       </div>
-                      <span
-                        key={item.quantity * item.selectedVariant.price}
-                        className="font-bold text-coffee-800 animate-fade-in"
-                      >
-                        ₹{item.selectedVariant.price * item.quantity}
-                      </span>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </div>
