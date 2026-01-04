@@ -120,7 +120,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
               <span className="text-gray-600">Subtotal</span>
               <span key={subtotal} className="text-xl font-bold text-coffee-900 animate-pop">₹{subtotal}</span>
             </div>
-            <p className="text-xs text-gray-500 mb-4 text-center">Shipping & taxes calculated at checkout</p>
+            {/* <p className="text-xs text-gray-500 mb-4 text-center">Shipping & taxes calculated at checkout</p> */}
             <button
               onClick={onCheckout}
               className="w-full bg-coffee-900 text-white py-4 rounded-sm font-bold uppercase tracking-widest hover:bg-coffee-800 transition-colors hover:shadow-lg transform active:scale-95 duration-200"

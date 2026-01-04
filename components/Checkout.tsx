@@ -35,7 +35,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
   }, [currentUser]);
 
   const subtotal = cart.reduce((acc, item) => acc + (item.selectedVariant.price * item.quantity), 0);
-  const shipping = subtotal >= 499 ? 0 : 100;
+  // const shipping = subtotal >= 499 ? 0 : 100;
+  const shipping = 0;
 
   // Calculate Discount
   let discountAmount = 0;
@@ -308,7 +309,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
 
           <div className="border-t border-gray-100 pt-4 space-y-2">
             <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>₹{subtotal}</span></div>
-            <div className="flex justify-between text-gray-600"><span>Shipping</span><span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span></div>
+            {/* <div className="flex justify-between text-gray-600"><span>Shipping</span><span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span></div> */}
 
             {appliedCoupon && (
               <div className="flex justify-between text-green-700 font-bold">
@@ -317,9 +318,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
               </div>
             )}
 
-            {shipping > 0 && (
+            {/* {shipping > 0 && (
               <p className="text-[10px] text-gold-600 font-bold text-right italic">+ Add ₹{499 - subtotal} more for Free Delivery</p>
-            )}
+            )} */}
           </div>
           <div className="border-t border-gray-200 pt-4 mt-4 flex justify-between items-center">
             <span className="font-serif font-bold text-xl text-coffee-900">Total</span>
