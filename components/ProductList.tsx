@@ -21,6 +21,9 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [intensities, setIntensities] = useState<Record<string, 'Light' | 'Medium' | 'Strong'>>({});
+
+  const getIntensity = (productId: string) => intensities[productId] || 'Medium';
 
   // Fetch products from backend
   React.useEffect(() => {
@@ -122,7 +125,12 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 {mode === 'shop' && cart && onUpdateQuantity ? (
                   (() => {
                     const defaultVariant = product.variants[0];
-                    const cartItem = cart.find(item => item.id === product.id && item.selectedVariant.weight === defaultVariant.weight);
+                    const currentIntensity = getIntensity(product.id);
+                    const cartItem = cart.find(item =>
+                      item.id === product.id &&
+                      item.selectedVariant.weight === defaultVariant.weight &&
+                      (!item.selectedIntensity || item.selectedIntensity === currentIntensity)
+                    );
 
                     if (cartItem) {
                       return (
@@ -131,14 +139,14 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                           onClick={(e) => e.stopPropagation()}
                         >
                           <button
-                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, -1)}
+                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}`, -1)}
                             className="w-8 md:w-12 h-full flex items-center justify-center text-white hover:bg-white/20 transition-colors font-bold text-lg pb-1"
                           >
                             -
                           </button>
                           <span className="font-bold text-gold-400 text-sm md:text-base min-w-[1.5rem] text-center">{cartItem.quantity}</span>
                           <button
-                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, 1)}
+                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}`, 1)}
                             className="w-8 md:w-12 h-full flex items-center justify-center text-white hover:bg-white/20 transition-colors font-bold text-lg pb-1"
                           >
                             +
@@ -150,10 +158,10 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (product.category === 'Filter Powder' || product.category === 'Instant') {
-                            onProductClick(product);
-                          } else if (onQuickAdd) {
-                            onQuickAdd(product, defaultVariant);
+                          if (onQuickAdd) {
+                            const v = product.variants[0];
+                            const intensity = (product.category === 'Filter Powder' || product.category === 'Instant') ? currentIntensity : undefined;
+                            onQuickAdd({ ...product, selectedIntensity: intensity } as any, v);
                           }
                         }}
                         className="absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110"
@@ -188,26 +196,51 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                   {product.description}
                 </p>
 
+                {/* Intensity Selection for Card (Only Shop Mode) */}
+                {mode === 'shop' && (product.category === 'Filter Powder' || product.category === 'Instant') && (
+                  <div className="mb-4" onClick={e => e.stopPropagation()}>
+                    <div className="flex gap-1">
+                      {(['Light', 'Medium', 'Strong'] as const).map((int) => (
+                        <button
+                          key={int}
+                          onClick={() => setIntensities(prev => ({ ...prev, [product.id]: int }))}
+                          className={`flex-1 py-1 text-[8px] md:text-[10px] font-bold uppercase border rounded-sm transition-all ${getIntensity(product.id) === int
+                              ? 'bg-coffee-900 text-white border-coffee-900'
+                              : 'bg-white text-coffee-600 border-gray-200 hover:border-gold-300'
+                            }`}
+                        >
+                          {int}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between mt-auto pt-3 md:pt-6 border-t border-gray-100 group-hover:border-gold-100 transition-colors">
                   <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{product.variants[0].price}</span>
 
                   {mode === 'shop' && cart && onUpdateQuantity && onQuickAdd && (
                     (() => {
                       const defaultVariant = product.variants[0];
-                      const cartItem = cart.find(item => item.id === product.id && item.selectedVariant.weight === defaultVariant.weight);
+                      const currentIntensity = getIntensity(product.id);
+                      const cartItem = cart.find(item =>
+                        item.id === product.id &&
+                        item.selectedVariant.weight === defaultVariant.weight &&
+                        (!item.selectedIntensity || item.selectedIntensity === currentIntensity)
+                      );
 
                       if (cartItem) {
                         return (
                           <div className="flex items-center gap-2 bg-coffee-100 rounded-full px-2 py-1" onClick={e => e.stopPropagation()}>
                             <button
-                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, -1)}
+                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}`, -1)}
                               className="w-6 h-6 flex items-center justify-center bg-white rounded-full text-coffee-900 hover:bg-coffee-200 transition-colors shadow-sm font-bold pb-0.5"
                             >
                               -
                             </button>
                             <span className="font-bold text-coffee-900 text-sm min-w-[1.25rem] text-center">{cartItem.quantity}</span>
                             <button
-                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}`, 1)}
+                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}`, 1)}
                               className="w-6 h-6 flex items-center justify-center bg-coffee-900 rounded-full text-white hover:bg-coffee-800 transition-colors shadow-sm font-bold pb-0.5"
                             >
                               +
@@ -219,11 +252,9 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              if (product.category === 'Filter Powder' || product.category === 'Instant') {
-                                onProductClick(product);
-                              } else if (onQuickAdd) {
-                                onQuickAdd(product, defaultVariant);
-                              }
+                              const v = product.variants[0];
+                              const intensity = (product.category === 'Filter Powder' || product.category === 'Instant') ? currentIntensity : undefined;
+                              onQuickAdd({ ...product, selectedIntensity: intensity } as any, v);
                             }}
                             className="text-xs font-bold uppercase tracking-widest text-white bg-coffee-900 px-4 py-2 rounded-full hover:bg-gold-600 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
                           >
