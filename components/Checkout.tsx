@@ -210,9 +210,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
   return (
     <div className="min-h-screen bg-coffee-50 py-12 px-4 animate-fade-in">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div>
-          <button onClick={onBack} className="text-coffee-700 font-bold mb-6 flex items-center hover:underline">
-            ← Back to Shop
+        <div className="relative z-10">
+          <button onClick={onBack} className="text-coffee-700 font-bold mb-8 flex items-center hover:text-gold-600 transition-colors group">
+            <span className="mr-2 transform group-hover:-translate-x-1 transition-transform">←</span>
+            Back to Shop
           </button>
           <h2 className="text-3xl font-serif font-bold text-coffee-900 mb-8">Checkout</h2>
 

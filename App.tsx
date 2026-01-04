@@ -156,7 +156,7 @@ function App() {
 
     if (view === AppView.CHECKOUT) {
       return (
-        <div className="pt-28">
+        <div className="pt-44">
           <Checkout cart={cart} onBack={() => setView(AppView.HOME)} onSuccess={handleCheckoutSuccess} currentUser={currentUser} />
         </div>
       );
