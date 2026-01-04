@@ -22,8 +22,10 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [intensities, setIntensities] = useState<Record<string, 'Light' | 'Medium' | 'Strong'>>({});
+  const [roasts, setRoasts] = useState<Record<string, 'Light' | 'Medium' | 'Dark'>>({});
 
   const getIntensity = (productId: string) => intensities[productId] || 'Medium';
+  const getRoast = (productId: string, defaultRoast: string) => roasts[productId] || (defaultRoast as any) || 'Medium';
 
   // Fetch products from backend
   React.useEffect(() => {
@@ -126,27 +128,30 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                   (() => {
                     const defaultVariant = product.variants[0];
                     const currentIntensity = getIntensity(product.id);
+                    const currentRoast = getRoast(product.id, product.roast);
                     const cartItem = cart.find(item =>
                       item.id === product.id &&
                       item.selectedVariant.weight === defaultVariant.weight &&
-                      (!item.selectedIntensity || item.selectedIntensity === currentIntensity)
+                      (!item.selectedIntensity || item.selectedIntensity === currentIntensity) &&
+                      (!item.selectedRoast || item.selectedRoast === currentRoast)
                     );
 
                     if (cartItem) {
+                      const compositeId = `${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}${cartItem.selectedRoast ? `-${cartItem.selectedRoast}` : ''}`;
                       return (
                         <div
                           className="absolute -top-4 right-4 md:-top-6 md:right-8 bg-coffee-900 rounded-full shadow-lg flex items-center border-2 border-white z-10 overflow-hidden h-8 md:h-12 animate-fade-in"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <button
-                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}`, -1)}
+                            onClick={() => onUpdateQuantity(compositeId, -1)}
                             className="w-8 md:w-12 h-full flex items-center justify-center text-white hover:bg-white/20 transition-colors font-bold text-lg pb-1"
                           >
                             -
                           </button>
                           <span className="font-bold text-gold-400 text-sm md:text-base min-w-[1.5rem] text-center">{cartItem.quantity}</span>
                           <button
-                            onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}`, 1)}
+                            onClick={() => onUpdateQuantity(compositeId, 1)}
                             className="w-8 md:w-12 h-full flex items-center justify-center text-white hover:bg-white/20 transition-colors font-bold text-lg pb-1"
                           >
                             +
@@ -161,7 +166,8 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                           if (onQuickAdd) {
                             const v = product.variants[0];
                             const intensity = (product.category === 'Filter Powder' || product.category === 'Instant') ? currentIntensity : undefined;
-                            onQuickAdd({ ...product, selectedIntensity: intensity } as any, v);
+                            const roast = (product.category === 'Beans') ? currentRoast : undefined;
+                            onQuickAdd({ ...product, selectedIntensity: intensity, selectedRoast: roast } as any, v);
                           }
                         }}
                         className="absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110"
@@ -205,11 +211,31 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                           key={int}
                           onClick={() => setIntensities(prev => ({ ...prev, [product.id]: int }))}
                           className={`flex-1 py-1 text-[8px] md:text-[10px] font-bold uppercase border rounded-sm transition-all ${getIntensity(product.id) === int
-                              ? 'bg-coffee-900 text-white border-coffee-900'
-                              : 'bg-white text-coffee-600 border-gray-200 hover:border-gold-300'
+                            ? 'bg-coffee-900 text-white border-coffee-900'
+                            : 'bg-white text-coffee-600 border-gray-200 hover:border-gold-300'
                             }`}
                         >
                           {int}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Roast Selection for Card (Only Shop Mode) */}
+                {mode === 'shop' && product.category === 'Beans' && (
+                  <div className="mb-4" onClick={e => e.stopPropagation()}>
+                    <div className="flex gap-1">
+                      {(['Light', 'Medium', 'Dark'] as const).map((rst) => (
+                        <button
+                          key={rst}
+                          onClick={() => setRoasts(prev => ({ ...prev, [product.id]: rst }))}
+                          className={`flex-1 py-1 text-[8px] md:text-[10px] font-bold uppercase border rounded-sm transition-all ${getRoast(product.id, product.roast) === rst
+                            ? 'bg-coffee-900 text-white border-coffee-900'
+                            : 'bg-white text-coffee-600 border-gray-200 hover:border-gold-300'
+                            }`}
+                        >
+                          {rst}
                         </button>
                       ))}
                     </div>
@@ -223,24 +249,27 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                     (() => {
                       const defaultVariant = product.variants[0];
                       const currentIntensity = getIntensity(product.id);
+                      const currentRoast = getRoast(product.id, product.roast);
                       const cartItem = cart.find(item =>
                         item.id === product.id &&
                         item.selectedVariant.weight === defaultVariant.weight &&
-                        (!item.selectedIntensity || item.selectedIntensity === currentIntensity)
+                        (!item.selectedIntensity || item.selectedIntensity === currentIntensity) &&
+                        (!item.selectedRoast || item.selectedRoast === currentRoast)
                       );
 
                       if (cartItem) {
+                        const compositeId = `${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}${cartItem.selectedRoast ? `-${cartItem.selectedRoast}` : ''}`;
                         return (
                           <div className="flex items-center gap-2 bg-coffee-100 rounded-full px-2 py-1" onClick={e => e.stopPropagation()}>
                             <button
-                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}`, -1)}
+                              onClick={() => onUpdateQuantity(compositeId, -1)}
                               className="w-6 h-6 flex items-center justify-center bg-white rounded-full text-coffee-900 hover:bg-coffee-200 transition-colors shadow-sm font-bold pb-0.5"
                             >
                               -
                             </button>
                             <span className="font-bold text-coffee-900 text-sm min-w-[1.25rem] text-center">{cartItem.quantity}</span>
                             <button
-                              onClick={() => onUpdateQuantity(`${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}`, 1)}
+                              onClick={() => onUpdateQuantity(compositeId, 1)}
                               className="w-6 h-6 flex items-center justify-center bg-coffee-900 rounded-full text-white hover:bg-coffee-800 transition-colors shadow-sm font-bold pb-0.5"
                             >
                               +
@@ -254,7 +283,8 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                               e.stopPropagation();
                               const v = product.variants[0];
                               const intensity = (product.category === 'Filter Powder' || product.category === 'Instant') ? currentIntensity : undefined;
-                              onQuickAdd({ ...product, selectedIntensity: intensity } as any, v);
+                              const roast = (product.category === 'Beans') ? currentRoast : undefined;
+                              onQuickAdd({ ...product, selectedIntensity: intensity, selectedRoast: roast } as any, v);
                             }}
                             className="text-xs font-bold uppercase tracking-widest text-white bg-coffee-900 px-4 py-2 rounded-full hover:bg-gold-600 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
                           >

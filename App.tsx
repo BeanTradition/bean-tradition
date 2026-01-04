@@ -78,13 +78,15 @@ function App() {
       const existing = prev.find(item =>
         item.id === newItem.id &&
         item.selectedVariant.weight === newItem.selectedVariant.weight &&
-        item.selectedIntensity === newItem.selectedIntensity
+        item.selectedIntensity === newItem.selectedIntensity &&
+        item.selectedRoast === newItem.selectedRoast
       );
       if (existing) {
         return prev.map(item =>
           (item.id === newItem.id &&
             item.selectedVariant.weight === newItem.selectedVariant.weight &&
-            item.selectedIntensity === newItem.selectedIntensity)
+            item.selectedIntensity === newItem.selectedIntensity &&
+            item.selectedRoast === newItem.selectedRoast)
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
         );
@@ -95,7 +97,7 @@ function App() {
 
   const updateQuantityComposite = (compositeId: string, delta: number) => {
     setCart(prev => prev.map(item => {
-      const key = `${item.id}-${item.selectedVariant.weight}${item.selectedIntensity ? `-${item.selectedIntensity}` : ''}`;
+      const key = `${item.id}-${item.selectedVariant.weight}${item.selectedIntensity ? `-${item.selectedIntensity}` : ''}${item.selectedRoast ? `-${item.selectedRoast}` : ''}`;
       if (key === compositeId) {
         return { ...item, quantity: Math.max(0, item.quantity + delta) };
       }
@@ -105,7 +107,7 @@ function App() {
 
   const removeItemComposite = (compositeId: string) => {
     setCart(prev => prev.filter(item => {
-      const key = `${item.id}-${item.selectedVariant.weight}${item.selectedIntensity ? `-${item.selectedIntensity}` : ''}`;
+      const key = `${item.id}-${item.selectedVariant.weight}${item.selectedIntensity ? `-${item.selectedIntensity}` : ''}${item.selectedRoast ? `-${item.selectedRoast}` : ''}`;
       return key !== compositeId;
     }));
   };
@@ -245,7 +247,7 @@ function App() {
       <Navbar cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)} onOpenCart={() => setIsCartOpen(true)} onNavigate={setView} currentUser={currentUser} />
       {renderView()}
       <ProductModal product={selectedProduct} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddToCart={addToCart} />
-      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} items={cart.map(c => ({ ...c, id: `${c.id}-${c.selectedVariant.weight}${c.selectedIntensity ? `-${c.selectedIntensity}` : ''}` }))} onUpdateQuantity={updateQuantityComposite} onRemoveItem={removeItemComposite} onCheckout={() => { setIsCartOpen(false); if (currentUser) { setView(AppView.CHECKOUT); } else { setView(AppView.AUTH); } }} />
+      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} items={cart.map(c => ({ ...c, id: `${c.id}-${c.selectedVariant.weight}${c.selectedIntensity ? `-${c.selectedIntensity}` : ''}${c.selectedRoast ? `-${c.selectedRoast}` : ''}` }))} onUpdateQuantity={updateQuantityComposite} onRemoveItem={removeItemComposite} onCheckout={() => { setIsCartOpen(false); if (currentUser) { setView(AppView.CHECKOUT); } else { setView(AppView.AUTH); } }} />
     </>
   );
 }

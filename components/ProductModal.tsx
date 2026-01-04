@@ -12,12 +12,14 @@ interface ProductModalProps {
 export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose, onAddToCart }) => {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [selectedIntensity, setSelectedIntensity] = useState<'Light' | 'Medium' | 'Strong'>('Medium');
+  const [selectedRoast, setSelectedRoast] = useState<'Light' | 'Medium' | 'Dark'>('Medium');
   const [isAdded, setIsAdded] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setSelectedVariantIndex(0);
       setSelectedIntensity('Medium');
+      setSelectedRoast(product?.roast || 'Medium');
       setIsAdded(false);
       // Prevent background scrolling
       document.body.style.overflow = 'hidden';
@@ -42,6 +44,10 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
 
     if (product.category === 'Filter Powder' || product.category === 'Instant') {
       cartItem.selectedIntensity = selectedIntensity;
+    }
+
+    if (product.category === 'Beans') {
+      cartItem.selectedRoast = selectedRoast;
     }
 
     onAddToCart(cartItem);
@@ -94,6 +100,9 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
                 {(product.category === 'Filter Powder' || product.category === 'Instant') && (
                   <> with <span className="font-bold text-coffee-800">{selectedIntensity}</span> intensity</>
                 )}
+                {product.category === 'Beans' && (
+                  <> with <span className="font-bold text-coffee-800">{selectedRoast}</span> roast</>
+                )}
                 has been successfully added to your order.
               </p>
               <button
@@ -134,6 +143,27 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
                           }`}
                       >
                         <span className="block text-xs font-bold uppercase tracking-wider">{intensity}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Roast Selection for Beans */}
+              {product.category === 'Beans' && (
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-coffee-900 uppercase tracking-widest mb-3">Select Roast Level</label>
+                  <div className="flex gap-2">
+                    {(['Light', 'Medium', 'Dark'] as const).map((roast) => (
+                      <button
+                        key={roast}
+                        onClick={() => setSelectedRoast(roast)}
+                        className={`flex-1 px-3 py-2 border rounded-sm transition-all duration-300 ${selectedRoast === roast
+                          ? 'border-gold-500 bg-coffee-900 text-white shadow-md'
+                          : 'border-coffee-200 text-coffee-800 hover:border-gold-400'
+                          }`}
+                      >
+                        <span className="block text-xs font-bold uppercase tracking-wider">{roast}</span>
                       </button>
                     ))}
                   </div>

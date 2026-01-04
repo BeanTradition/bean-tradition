@@ -272,6 +272,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
                     <span className="text-xs text-gray-500">
                       {item.selectedVariant.weight} x {item.quantity}
                       {item.selectedIntensity && ` • ${item.selectedIntensity} Intensity`}
+                      {item.selectedRoast && ` • ${item.selectedRoast} Roast`}
                     </span>
                   </div>
                 </div>
