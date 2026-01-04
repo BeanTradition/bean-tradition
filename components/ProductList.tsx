@@ -150,7 +150,11 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (onQuickAdd) onQuickAdd(product, defaultVariant);
+                          if (product.category === 'Filter Powder' || product.category === 'Instant') {
+                            onProductClick(product);
+                          } else if (onQuickAdd) {
+                            onQuickAdd(product, defaultVariant);
+                          }
                         }}
                         className="absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110"
                       >
@@ -215,7 +219,11 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              onQuickAdd(product, defaultVariant);
+                              if (product.category === 'Filter Powder' || product.category === 'Instant') {
+                                onProductClick(product);
+                              } else if (onQuickAdd) {
+                                onQuickAdd(product, defaultVariant);
+                              }
                             }}
                             className="text-xs font-bold uppercase tracking-widest text-white bg-coffee-900 px-4 py-2 rounded-full hover:bg-gold-600 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
                           >

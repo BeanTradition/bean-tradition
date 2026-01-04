@@ -11,11 +11,13 @@ interface ProductModalProps {
 
 export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose, onAddToCart }) => {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const [selectedIntensity, setSelectedIntensity] = useState<'Light' | 'Medium' | 'Strong'>('Medium');
   const [isAdded, setIsAdded] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setSelectedVariantIndex(0);
+      setSelectedIntensity('Medium');
       setIsAdded(false);
       // Prevent background scrolling
       document.body.style.overflow = 'hidden';
@@ -32,11 +34,17 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
   if (!isOpen || !product) return null;
 
   const handleAddToCart = () => {
-    onAddToCart({
+    const cartItem: CartItem = {
       ...product,
       selectedVariant: product.variants[selectedVariantIndex],
       quantity: 1
-    });
+    };
+
+    if (product.category === 'Filter Powder' || product.category === 'Instant') {
+      cartItem.selectedIntensity = selectedIntensity;
+    }
+
+    onAddToCart(cartItem);
     setIsAdded(true);
   };
 
@@ -82,7 +90,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
               </div>
               <h3 className="text-3xl font-serif font-bold text-coffee-900 mb-2">Added to your cart</h3>
               <p className="text-gray-500 mb-8 max-w-xs mx-auto leading-relaxed">
-                <span className="text-coffee-900 font-bold">{product.name}</span> has been successfully added to your order.
+                <span className="text-coffee-900 font-bold">{product.name}</span>
+                {(product.category === 'Filter Powder' || product.category === 'Instant') && (
+                  <> with <span className="font-bold text-coffee-800">{selectedIntensity}</span> intensity</>
+                )}
+                has been successfully added to your order.
               </p>
               <button
                 onClick={onClose}
@@ -95,7 +107,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
             <>
               <div className="mb-4 flex items-center justify-between">
                 <span className="inline-block px-4 py-1 bg-coffee-100 text-coffee-800 text-xs font-bold uppercase tracking-widest rounded-full">
-                  {product.roast} Roast
+                  {product.category === 'Beans' ? `${product.roast} Roast` : product.category}
                 </span>
               </div>
 
@@ -106,6 +118,27 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
               <p className="text-coffee-700 text-sm md:text-lg leading-relaxed mb-6 md:mb-8 font-light">
                 {product.description}
               </p>
+
+              {/* Intensity Selection for Filter Coffee and Instant Coffee */}
+              {(product.category === 'Filter Powder' || product.category === 'Instant') && (
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-coffee-900 uppercase tracking-widest mb-3">Select Intensity</label>
+                  <div className="flex gap-2">
+                    {(['Light', 'Medium', 'Strong'] as const).map((intensity) => (
+                      <button
+                        key={intensity}
+                        onClick={() => setSelectedIntensity(intensity)}
+                        className={`flex-1 px-3 py-2 border rounded-sm transition-all duration-300 ${selectedIntensity === intensity
+                          ? 'border-gold-500 bg-coffee-900 text-white shadow-md'
+                          : 'border-coffee-200 text-coffee-800 hover:border-gold-400'
+                          }`}
+                      >
+                        <span className="block text-xs font-bold uppercase tracking-wider">{intensity}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="mb-8">
                 <label className="block text-sm font-bold text-coffee-900 uppercase tracking-widest mb-3">Select Size</label>

@@ -32,6 +32,7 @@ export interface Product {
 export interface CartItem extends Product {
   selectedVariant: ProductVariant;
   quantity: number;
+  selectedIntensity?: 'Light' | 'Medium' | 'Strong';
 }
 
 export interface UserDetails {

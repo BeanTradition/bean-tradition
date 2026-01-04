@@ -78,7 +78,9 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                   </div>
                   <div className="flex-grow">
                     <h3 className="font-serif font-bold text-coffee-900">{item.name}</h3>
-                    <p className="text-sm text-gray-500 mb-2">{item.selectedVariant.weight} • {item.roast}</p>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {item.selectedVariant.weight} • {item.selectedIntensity ? `${item.selectedIntensity} Intensity` : item.roast}
+                    </p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center border border-gray-300 rounded-sm">
                         <button
