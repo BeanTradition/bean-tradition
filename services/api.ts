@@ -165,3 +165,8 @@ export const validateCoupon = async (code: string): Promise<{ valid: boolean, di
     const { data } = await api.post('/coupons/validate', { code });
     return data;
 };
+
+export const getShippingRates = async (destination: string, weight: number): Promise<any> => {
+    const { data } = await api.post('/shipping/rates', { destination, weight });
+    return data;
+};

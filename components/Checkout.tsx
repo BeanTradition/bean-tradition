@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CartItem, UserDetails, Order, User } from '../types';
-import { validateCoupon } from '../services/api';
+import { validateCoupon, getShippingRates } from '../services/api';
 
 interface CheckoutProps {
   cart: CartItem[];
@@ -21,6 +21,11 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
   const [couponError, setCouponError] = useState('');
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
+  // Shipping State
+  const [estimatedShipping, setEstimatedShipping] = useState<number>(0);
+  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
+  const [shippingError, setShippingError] = useState('');
+
   useEffect(() => {
     if (currentUser) {
       setFormData({
@@ -34,9 +39,51 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
     }
   }, [currentUser]);
 
+  // Calculate Weight (assume item weight is in grams, converted to kg or vice versa)
+  // For simplicity, let's assume each item in cart has a wait in gm. 
+  // Most products have variants like '250gm'.
+  const totalWeightKg = cart.reduce((acc, item) => {
+    const weightStr = item.selectedVariant.weight.toLowerCase();
+    const weightVal = parseFloat(weightStr);
+    if (weightStr.includes('kg')) return acc + (weightVal * item.quantity);
+    if (weightStr.includes('gm')) return acc + ((weightVal / 1000) * item.quantity);
+    return acc + (0.5 * item.quantity); // Default 500gm
+  }, 0);
+
   const subtotal = cart.reduce((acc, item) => acc + (item.selectedVariant.price * item.quantity), 0);
-  // const shipping = subtotal >= 499 ? 0 : 100;
-  const shipping = 0;
+
+  // Calculate Shipping when Pincode changes
+  useEffect(() => {
+    const fetchShipping = async () => {
+      if (formData.pincode.length === 6) {
+        setIsCalculatingShipping(true);
+        setShippingError('');
+        try {
+          const rates = await getShippingRates(formData.pincode, totalWeightKg);
+          // Delhivery 'charges' response structure can vary, but usually has a 'total_amount' or similar
+          // This is a test mapping. Adjust based on real API response.
+          if (rates && rates.per_package_charge) {
+            setEstimatedShipping(Math.ceil(rates.per_package_charge));
+          } else if (rates && rates.total_amount) {
+            setEstimatedShipping(Math.ceil(rates.total_amount));
+          } else {
+            // Fallback to old logic if API is test/failed
+            setEstimatedShipping(subtotal >= 499 ? 0 : 100);
+          }
+        } catch (error) {
+          console.error("Shipping Check Error:", error);
+          setShippingError('Could not calculate shipping for this pincode.');
+          setEstimatedShipping(subtotal >= 499 ? 0 : 100); // Fallback
+        }
+        setIsCalculatingShipping(false);
+      }
+    };
+
+    const timer = setTimeout(fetchShipping, 1000);
+    return () => clearTimeout(timer);
+  }, [formData.pincode, totalWeightKg, subtotal]);
+
+  const shipping = estimatedShipping;
 
   // Calculate Discount
   let discountAmount = 0;
@@ -314,7 +361,18 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
 
           <div className="border-t border-gray-100 pt-4 space-y-2">
             <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>₹{subtotal}</span></div>
-            {/* <div className="flex justify-between text-gray-600"><span>Shipping</span><span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span></div> */}
+            <div className="flex justify-between text-gray-600">
+              <span>Shipping</span>
+              <span>
+                {isCalculatingShipping ? (
+                  <span className="text-[10px] animate-pulse">Calculating...</span>
+                ) : (
+                  shipping === 0 ? 'Free' : `₹${shipping}`
+                )}
+              </span>
+            </div>
+
+            {shippingError && <p className="text-[10px] text-red-500 italic mt-1">{shippingError}</p>}
 
             {appliedCoupon && (
               <div className="flex justify-between text-green-700 font-bold">
@@ -323,9 +381,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
               </div>
             )}
 
-            {/* {shipping > 0 && (
+            {shipping === 100 && subtotal < 499 && (
               <p className="text-[10px] text-gold-600 font-bold text-right italic">+ Add ₹{499 - subtotal} more for Free Delivery</p>
-            )} */}
+            )}
           </div>
           <div className="border-t border-gray-200 pt-4 mt-4 flex justify-between items-center">
             <span className="font-serif font-bold text-xl text-coffee-900">Total</span>
