@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { getAllOrders, fetchProducts, deleteProduct as apiDeleteProduct, createProduct, getCoupons, createCoupon, updateCouponStatus, deleteCoupon as apiDeleteCoupon } from '../services/api';
+import { getAllOrders, fetchProducts, deleteProduct as apiDeleteProduct, createProduct, updateProduct, getCoupons, createCoupon, updateCouponStatus, deleteCoupon as apiDeleteCoupon } from '../services/api';
 import { Order, Product, Coupon } from '../types';
 
 interface AdminDashboardProps {
@@ -25,7 +25,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
         tags: '',
         tastingNotes: '',
         bestFor: '',
-        variants: [{ weight: '250gm', price: 0 }]
+        variants: [{ weight: '250gm', price: 0 }],
+        stock_weight_grams: 5000 // Default 5kg
     });
 
     // Coupon Form State
@@ -81,7 +82,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                 tags: '',
                 tastingNotes: '',
                 bestFor: '',
-                variants: [{ weight: '250gm', price: 0 }]
+                variants: [{ weight: '250gm', price: 0 }],
+                stock_weight_grams: 5000
             });
         } catch (error) {
             console.error(error);
@@ -271,6 +273,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                     <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Image URL (e.g. /assets/new.jpg)</label>
                                     <input required type="text" className="w-full border border-gray-200 p-3 rounded-lg focus:border-gold-500 outline-none font-mono text-sm" value={newProduct.image} onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })} />
                                 </div>
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Initial Stock (in Grams)</label>
+                                    <input required type="number" className="w-full border border-gray-200 p-3 rounded-lg focus:border-gold-500 outline-none font-mono text-sm" value={newProduct.stock_weight_grams} onChange={(e) => setNewProduct({ ...newProduct, stock_weight_grams: parseInt(e.target.value) })} />
+                                    <p className="text-[10px] text-gray-400 mt-1 uppercase italic">Example: 5000 = 5kg</p>
+                                </div>
                             </div>
 
                             <div className="space-y-4">
@@ -379,17 +386,50 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                         )}
 
                         {products.map(product => (
-                            <div key={product.id || product._id} className="bg-white rounded-xl shadow overflow-hidden flex flex-col">
+                            <div key={product.id || product._id} className="bg-white rounded-xl shadow overflow-hidden flex flex-col border border-gray-100">
                                 <img src={product.image} alt={product.name} className="h-40 w-full object-cover" />
                                 <div className="p-4 flex-grow">
-                                    <h3 className="font-bold text-coffee-900">{product.name}</h3>
-                                    <p className="text-sm text-gray-500 mb-4">{product.category}</p>
-                                    <button
-                                        onClick={() => handleDeleteProduct(product.id || product._id!)}
-                                        className="text-red-500 text-xs font-bold uppercase hover:underline"
-                                    >
-                                        Delete Product
-                                    </button>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="font-bold text-coffee-900 leading-tight">{product.name}</h3>
+                                        <span className="bg-coffee-50 text-coffee-700 text-[10px] px-2 py-0.5 rounded font-bold uppercase">{product.category}</span>
+                                    </div>
+
+                                    <div className="bg-gold-50 p-3 rounded-lg mb-4 border border-gold-100">
+                                        <div className="flex justify-between items-center text-xs font-bold text-gold-800 uppercase tracking-tighter mb-1">
+                                            <span>Current Stock</span>
+                                            <span>{(product.stock_weight_grams || 0) / 1000} KG</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="number"
+                                                className="w-full bg-white border border-gold-200 text-xs p-1.5 rounded outline-none focus:border-gold-500"
+                                                defaultValue={product.stock_weight_grams}
+                                                onBlur={async (e) => {
+                                                    const newValue = parseInt(e.target.value);
+                                                    if (isNaN(newValue)) return;
+                                                    try {
+                                                        const updated = await updateProduct(product.id || product._id!, { stock_weight_grams: newValue });
+                                                        setProducts(prev => prev.map(p => p.id === (product.id || product._id) ? updated : p));
+                                                    } catch (err) {
+                                                        alert("Failed to update stock");
+                                                    }
+                                                }}
+                                            />
+                                            <span className="text-[10px] text-gold-600 font-bold uppercase">Grams</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-between items-center pt-2 border-t border-gray-50 mt-auto">
+                                        <button
+                                            onClick={() => handleDeleteProduct(product.id || product._id!)}
+                                            className="text-red-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors"
+                                        >
+                                            Delete
+                                        </button>
+                                        <div className="text-[10px] text-gray-400 font-mono">
+                                            ID: {product.id?.substring(0, 8)}...
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}

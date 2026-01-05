@@ -41,6 +41,50 @@ const addOrderItems = async (req, res) => {
             return res.status(500).json({ message: 'Order creation failed', error: error.message });
         }
 
+        // Deduct Inventory Stock
+        try {
+            for (const item of orderItems) {
+                const productId = item.product;
+                const quantity = item.quantity;
+                const weightStr = item.weight.toLowerCase();
+
+                let weightInGrams = 0;
+                const numericalWeight = parseFloat(weightStr);
+
+                if (weightStr.includes('kg')) {
+                    weightInGrams = numericalWeight * 1000;
+                } else if (weightStr.includes('gm')) {
+                    weightInGrams = numericalWeight;
+                } else {
+                    // Default fallback if weight string is messy
+                    weightInGrams = 500;
+                }
+
+                const totalGramsToDeduct = weightInGrams * quantity;
+
+                // Update stock in Supabase using the RPC syntax or manual update
+                // Since Supabase doesn't have a built-in decrement for JSONB, we'll fetch and update
+                const { data: product, error: fetchError } = await supabase
+                    .from('products')
+                    .select('stock_weight_grams')
+                    .eq('id', productId)
+                    .single();
+
+                if (!fetchError && product) {
+                    const currentStock = product.stock_weight_grams || 0;
+                    const newStock = Math.max(0, currentStock - totalGramsToDeduct);
+
+                    await supabase
+                        .from('products')
+                        .update({ stock_weight_grams: newStock })
+                        .eq('id', productId);
+                }
+            }
+        } catch (stockError) {
+            console.error('Stock Deduction Error:', stockError);
+            // We don't fail the order if stock deduction fails, but we log it
+        }
+
         res.status(201).json({ ...createdOrder, _id: createdOrder.id });
     }
 };

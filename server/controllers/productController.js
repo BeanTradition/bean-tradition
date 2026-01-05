@@ -19,7 +19,8 @@ const getProducts = async (req, res) => {
         _id: p.id,
         // Ensure variants is parsed if it comes as string (should be object from JSONB but just in case)
         variants: typeof p.variants === 'string' ? JSON.parse(p.variants) : p.variants,
-        tags: typeof p.tags === 'string' ? JSON.parse(p.tags) : p.tags
+        tags: typeof p.tags === 'string' ? JSON.parse(p.tags) : p.tags,
+        stock_weight_grams: p.stock_weight_grams || 0
     }));
 
     res.json(mappedProducts);
@@ -62,7 +63,7 @@ const deleteProduct = async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = async (req, res) => {
-    const { name, price, image, category, countInStock, numReviews, description, roast, intensity, variants } = req.body;
+    const { name, image, category, countInStock, stock_weight_grams, numReviews, description, roast, intensity, variants } = req.body;
 
     // Note: 'price' is not in my DB schema for top level, it is in variants usually, but frontend sends it?
     // Looking at Types.ts: Product has variants. Variants have price. 
@@ -82,7 +83,8 @@ const createProduct = async (req, res) => {
             description,
             roast,
             intensity,
-            variants // JSONB array
+            variants, // JSONB array
+            stock_weight_grams: stock_weight_grams || 0
         }])
         .select()
         .single();
@@ -105,7 +107,8 @@ const updateProduct = async (req, res) => {
         category,
         roast,
         intensity,
-        variants
+        variants,
+        stock_weight_grams
     } = req.body;
 
     const { data: updatedProduct, error } = await supabase
@@ -117,7 +120,8 @@ const updateProduct = async (req, res) => {
             category,
             roast,
             intensity,
-            variants
+            variants,
+            stock_weight_grams
         })
         .eq('id', req.params.id)
         .select()

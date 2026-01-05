@@ -27,6 +27,7 @@ export interface Product {
   tastingNotes: string;
   bestFor: string;
   variants: ProductVariant[];
+  stock_weight_grams?: number;
 }
 
 export interface CartItem extends Product {

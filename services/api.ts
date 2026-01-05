@@ -121,6 +121,11 @@ export const createProduct = async (product: any): Promise<Product> => {
     return data;
 };
 
+export const updateProduct = async (id: string, product: any): Promise<Product> => {
+    const { data } = await api.put(`/products/${id}`, product);
+    return data;
+};
+
 export const forgotPassword = async (email: string) => {
     const { data } = await api.post('/users/forgotpassword', { email });
     return data;

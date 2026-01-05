@@ -120,6 +120,12 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white/95 px-2 md:px-4 py-1 md:py-2 text-[8px] md:text-xs font-bold uppercase tracking-tighter md:tracking-widest text-coffee-900 shadow-sm backdrop-blur-sm rounded-sm">
                   {product.category === 'Beans' ? `${product.roast} Roast` : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
                 </div>
+                {/* Out of Stock Overlay */}
+                {product.stock_weight_grams !== undefined && product.stock_weight_grams < 100 && (
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                    <span className="bg-red-600 text-white px-3 py-1 rounded text-[10px] md:text-sm font-bold uppercase tracking-widest shadow-lg">Out of Stock</span>
+                  </div>
+                )}
               </div>
 
               <div className="p-4 md:p-8 flex flex-col flex-grow bg-white relative">
@@ -135,6 +141,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                       (!item.selectedIntensity || item.selectedIntensity === currentIntensity) &&
                       (!item.selectedRoast || item.selectedRoast === currentRoast)
                     );
+                    const isOutOfStock = product.stock_weight_grams !== undefined && product.stock_weight_grams < 100;
 
                     if (cartItem) {
                       const compositeId = `${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}${cartItem.selectedRoast ? `-${cartItem.selectedRoast}` : ''}`;
@@ -161,6 +168,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                     }
                     return (
                       <button
+                        disabled={isOutOfStock}
                         onClick={(e) => {
                           e.stopPropagation();
                           if (onQuickAdd) {
@@ -170,9 +178,9 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                             onQuickAdd({ ...product, selectedIntensity: intensity, selectedRoast: roast } as any, v);
                           }
                         }}
-                        className="absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110"
+                        className={`absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 ${isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110'}`}
                       >
-                        +
+                        {isOutOfStock ? '!' : '+'}
                       </button>
                     );
                   })()
@@ -257,6 +265,8 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                         (!item.selectedRoast || item.selectedRoast === currentRoast)
                       );
 
+                      const isOutOfStock = product.stock_weight_grams !== undefined && product.stock_weight_grams < 100;
+
                       if (cartItem) {
                         const compositeId = `${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}${cartItem.selectedRoast ? `-${cartItem.selectedRoast}` : ''}`;
                         return (
@@ -276,25 +286,30 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                             </button>
                           </div>
                         );
-                      } else {
-                        return (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
+                      }
+
+                      return (
+                        <button
+                          disabled={isOutOfStock}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onQuickAdd) {
                               const v = product.variants[0];
                               const intensity = (product.category === 'Filter Powder' || product.category === 'Instant') ? currentIntensity : undefined;
                               const roast = (product.category === 'Beans') ? currentRoast : undefined;
                               onQuickAdd({ ...product, selectedIntensity: intensity, selectedRoast: roast } as any, v);
-                            }}
-                            className="text-xs font-bold uppercase tracking-widest text-white bg-coffee-900 px-4 py-2 rounded-full hover:bg-gold-600 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
-                          >
-                            Add to Cart
+                            }
+                          }}
+                          className={`text-xs font-bold uppercase tracking-widest ${isOutOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-coffee-900 text-white hover:bg-gold-600'} px-4 py-2 rounded-full transition-colors shadow-md hover:shadow-lg flex items-center gap-2`}
+                        >
+                          {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+                          {!isOutOfStock && (
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                          </button>
-                        );
-                      }
+                          )}
+                        </button>
+                      );
                     })()
                   )}
                 </div>
