@@ -121,7 +121,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                   {product.category === 'Beans' ? `${product.roast} Roast` : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
                 </div>
                 {/* Out of Stock Overlay */}
-                {product.stock_weight_grams !== undefined && product.stock_weight_grams < 100 && (
+                {product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0 && (
                   <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
                     <span className="bg-red-600 text-white px-3 py-1 rounded text-[10px] md:text-sm font-bold uppercase tracking-widest shadow-lg">Out of Stock</span>
                   </div>
@@ -141,7 +141,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                       (!item.selectedIntensity || item.selectedIntensity === currentIntensity) &&
                       (!item.selectedRoast || item.selectedRoast === currentRoast)
                     );
-                    const isOutOfStock = product.stock_weight_grams !== undefined && product.stock_weight_grams < 100;
+                    const isOutOfStock = product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0;
 
                     if (cartItem) {
                       const compositeId = `${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}${cartItem.selectedRoast ? `-${cartItem.selectedRoast}` : ''}`;
@@ -265,7 +265,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                         (!item.selectedRoast || item.selectedRoast === currentRoast)
                       );
 
-                      const isOutOfStock = product.stock_weight_grams !== undefined && product.stock_weight_grams < 100;
+                      const isOutOfStock = product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0;
 
                       if (cartItem) {
                         const compositeId = `${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}${cartItem.selectedRoast ? `-${cartItem.selectedRoast}` : ''}`;

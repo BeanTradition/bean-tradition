@@ -213,14 +213,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
                   </div>
                 </div>
                 <button
-                  disabled={product.stock_weight_grams !== undefined && product.stock_weight_grams < 100}
+                  disabled={product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0}
                   onClick={handleAddToCart}
-                  className={`w-full sm:w-auto px-12 md:px-10 py-5 md:py-4 rounded-full font-bold uppercase tracking-widest transition-all transform ${product.stock_weight_grams !== undefined && product.stock_weight_grams < 100
+                  className={`w-full sm:w-auto px-12 md:px-10 py-5 md:py-4 rounded-full font-bold uppercase tracking-widest transition-all transform ${product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     : 'bg-coffee-900 text-white hover:bg-gold-600 hover:shadow-xl hover:-translate-y-1'
                     }`}
                 >
-                  {product.stock_weight_grams !== undefined && product.stock_weight_grams < 100 ? 'Out of Stock' : 'Add to Cart'}
+                  {product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0 ? 'Out of Stock' : 'Add to Cart'}
                 </button>
               </div>
             </>
