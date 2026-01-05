@@ -396,7 +396,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
 
                                     <div className="bg-gold-50 p-3 rounded-lg mb-4 border border-gold-100">
                                         <div className="flex justify-between items-center text-xs font-bold text-gold-800 uppercase tracking-tighter mb-1">
-                                            <span>Current Stock</span>
+                                            <div className="flex items-center gap-2">
+                                                <span>Current Stock</span>
+                                                {(product.stock_weight_grams || 0) < 1000 && (
+                                                    <span className="bg-red-500 text-white text-[8px] px-1 rounded animate-pulse">Low</span>
+                                                )}
+                                            </div>
                                             <span>{(product.stock_weight_grams || 0) / 1000} KG</span>
                                         </div>
                                         <div className="flex items-center gap-2">
