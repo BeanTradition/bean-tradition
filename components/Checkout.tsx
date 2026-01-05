@@ -51,7 +51,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
   }, 0);
 
   const subtotal = cart.reduce((acc, item) => acc + (item.selectedVariant.price * item.quantity), 0);
-
+  const shipping = 0; // Customer always gets Free Shipping
+  const adminShippingCost = estimatedShipping; // Hidden from customer, used for record keeping when Pincode changes
   // Calculate Shipping when Pincode changes
   useEffect(() => {
     const fetchShipping = async () => {
@@ -82,8 +83,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
     const timer = setTimeout(fetchShipping, 1000);
     return () => clearTimeout(timer);
   }, [formData.pincode, totalWeightKg, subtotal]);
-
-  const shipping = estimatedShipping;
 
   // Calculate Discount
   let discountAmount = 0;
@@ -202,7 +201,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
                   status: 'paid',
                   update_time: new Date().toISOString(),
                   email_address: formData.email,
-                  coupon_applied: appliedCoupon ? appliedCoupon.code : null
+                  coupon_applied: appliedCoupon ? appliedCoupon.code : null,
+                  estimated_shipping: adminShippingCost
                 }
               };
 
@@ -363,26 +363,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
             <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>₹{subtotal}</span></div>
             <div className="flex justify-between text-gray-600">
               <span>Shipping</span>
-              <span>
-                {isCalculatingShipping ? (
-                  <span className="text-[10px] animate-pulse">Calculating...</span>
-                ) : (
-                  shipping === 0 ? 'Free' : `₹${shipping}`
-                )}
-              </span>
+              <span className="text-green-600 font-bold">Free</span>
             </div>
-
-            {shippingError && <p className="text-[10px] text-red-500 italic mt-1">{shippingError}</p>}
 
             {appliedCoupon && (
               <div className="flex justify-between text-green-700 font-bold">
                 <span>Discount</span>
                 <span>- ₹{discountAmount}</span>
               </div>
-            )}
-
-            {shipping === 100 && subtotal < 499 && (
-              <p className="text-[10px] text-gold-600 font-bold text-right italic">+ Add ₹{499 - subtotal} more for Free Delivery</p>
             )}
           </div>
           <div className="border-t border-gray-200 pt-4 mt-4 flex justify-between items-center">
