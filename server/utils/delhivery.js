@@ -72,7 +72,7 @@ class DelhiveryService {
         }
 
         try {
-            const payload = {
+            const shipmentPayload = {
                 shipments: [
                     {
                         name: orderData.name,
@@ -91,19 +91,23 @@ class DelhiveryService {
                 }
             };
 
-            const response = await axios.post(`${this.prodUrl}/api/cmu/create.json`, payload, {
+            // Delhivery CMU API often requires URL-encoded payload: format=json&data={...}
+            const formData = new URLSearchParams();
+            formData.append('format', 'json');
+            formData.append('data', JSON.stringify(shipmentPayload));
+
+            const response = await axios.post(`${this.baseUrl}/api/cmu/create.json`, formData.toString(), {
                 headers: {
                     'Authorization': `Token ${this.token}`,
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'application/json'
                 }
             });
 
-            console.log('Delhivery Shipment Created:', response.data);
+            console.log('Delhivery Shipment Creation Response:', JSON.stringify(response.data, null, 2));
             return response.data;
         } catch (error) {
             console.error('Delhivery Shipment Creation Error:', error.response?.data || error.message);
-            // We don't throw here to avoid failing the order flow if the external API is down
             return null;
         }
     }
