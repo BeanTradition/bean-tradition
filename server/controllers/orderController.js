@@ -85,6 +85,28 @@ const addOrderItems = async (req, res) => {
             // We don't fail the order if stock deduction fails, but we log it
         }
 
+        // Increment Coupon Usage Count
+        try {
+            const couponCode = req.body.paymentResult?.coupon_applied;
+            if (couponCode) {
+                // Fetch the current usage count
+                const { data: coupon, error: fetchError } = await supabase
+                    .from('coupons')
+                    .select('id, usageCount')
+                    .eq('code', couponCode.toUpperCase())
+                    .single();
+
+                if (!fetchError && coupon) {
+                    await supabase
+                        .from('coupons')
+                        .update({ usageCount: (coupon.usageCount || 0) + 1 })
+                        .eq('id', coupon.id);
+                }
+            }
+        } catch (couponError) {
+            console.error('Coupon Increment Error:', couponError);
+        }
+
         res.status(201).json({ ...createdOrder, _id: createdOrder.id });
     }
 };
