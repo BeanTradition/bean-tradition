@@ -60,6 +60,53 @@ class DelhiveryService {
             return { deliverable: false };
         }
     }
+
+    /**
+     * Create Shipment (Manifestation)
+     * @param {Object} orderData { name, address, pincode, phone, orderId, amount, weight }
+     */
+    async createShipment(orderData) {
+        if (!this.token) {
+            console.warn('Delhivery Token missing, skipping shipment creation');
+            return null;
+        }
+
+        try {
+            const payload = {
+                shipments: [
+                    {
+                        name: orderData.name,
+                        add: orderData.address,
+                        pin: orderData.pincode,
+                        phone: orderData.phone,
+                        order: orderData.orderId,
+                        payment_mode: "Prepaid",
+                        shipping_mode: "Surface",
+                        total_amount: orderData.amount.toString(),
+                        weight: orderData.weight || 500
+                    }
+                ],
+                pickup_location: {
+                    name: process.env.DELHIVERY_WAREHOUSE_NAME || "Main_Warehouse"
+                }
+            };
+
+            const response = await axios.post(`${this.prodUrl}/api/cmu/create.json`, payload, {
+                headers: {
+                    'Authorization': `Token ${this.token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
+            console.log('Delhivery Shipment Created:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Delhivery Shipment Creation Error:', error.response?.data || error.message);
+            // We don't throw here to avoid failing the order flow if the external API is down
+            return null;
+        }
+    }
 }
 
 module.exports = new DelhiveryService();
