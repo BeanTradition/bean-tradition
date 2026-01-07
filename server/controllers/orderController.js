@@ -1,5 +1,6 @@
 const supabase = require('../config/supabaseClient');
 const delhiveryService = require('../utils/delhivery');
+const crypto = require('crypto');
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -19,6 +20,23 @@ const addOrderItems = async (req, res) => {
         res.status(400).json({ message: 'No order items' });
         return;
     } else {
+        // --- LOOPHOLE FIX: Razorpay Signature Verification ---
+        const { paymentResult } = req.body;
+        if (!paymentResult || !paymentResult.id || !paymentResult.razorpay_order_id || !paymentResult.razorpay_signature) {
+            return res.status(400).json({ message: 'Payment information missing' });
+        }
+
+        const generated_signature = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(`${paymentResult.razorpay_order_id}|${paymentResult.id}`)
+            .digest('hex');
+
+        if (generated_signature !== paymentResult.razorpay_signature) {
+            console.error('Security Alert: Invalid Razorpay Signature detected!');
+            return res.status(400).json({ message: 'Transaction not legit!' });
+        }
+        // --- END SIGNATURE FIX ---
+
         // --- LOOPHOLE FIX: Price & Coupon Validation ---
         let calculatedItemsPrice = 0;
         try {

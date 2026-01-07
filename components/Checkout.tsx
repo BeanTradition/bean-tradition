@@ -198,6 +198,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
                 totalPrice: total,
                 paymentResult: {
                   id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
                   status: 'paid',
                   update_time: new Date().toISOString(),
                   email_address: formData.email,
