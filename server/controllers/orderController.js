@@ -19,6 +19,65 @@ const addOrderItems = async (req, res) => {
         res.status(400).json({ message: 'No order items' });
         return;
     } else {
+        // --- LOOPHOLE FIX: Price & Coupon Validation ---
+        let calculatedItemsPrice = 0;
+        try {
+            for (const item of orderItems) {
+                const { data: product, error: pError } = await supabase
+                    .from('products')
+                    .select('variants')
+                    .eq('id', item.product)
+                    .single();
+
+                if (pError || !product) {
+                    return res.status(400).json({ message: `Product not found: ${item.name}` });
+                }
+
+                // Find the correct variant in DB
+                const dbVariant = product.variants.find(v => v.weight === item.weight);
+                if (!dbVariant) {
+                    return res.status(400).json({ message: `Invalid variant for ${item.name}` });
+                }
+
+                // Add to subtotal using DB price, NOT frontend price
+                calculatedItemsPrice += (dbVariant.price * item.quantity);
+            }
+
+            // Validate Coupon if applied
+            let discountAmount = 0;
+            const appliedCouponCode = req.body.paymentResult?.coupon_applied;
+            if (appliedCouponCode) {
+                const { data: coupon, error: cError } = await supabase
+                    .from('coupons')
+                    .select('*')
+                    .eq('code', appliedCouponCode.toUpperCase())
+                    .single();
+
+                if (!cError && coupon && coupon.isActive) {
+                    // Check if usage limit reached
+                    if (coupon.usageLimit === null || coupon.usageCount < coupon.usageLimit) {
+                        if (coupon.discountType === 'PERCENTAGE') {
+                            discountAmount = Math.round((calculatedItemsPrice * coupon.discountValue) / 100);
+                        } else {
+                            discountAmount = coupon.discountValue;
+                        }
+                    }
+                }
+            }
+
+            const expectedTotal = calculatedItemsPrice + (shippingPrice || 0) - discountAmount;
+
+            // Allow 1 INR difference for rounding
+            if (Math.abs(expectedTotal - totalPrice) > 1) {
+                console.error(`Security Alert: Price Mismatch. Expected: ${expectedTotal}, Got: ${totalPrice}`);
+                return res.status(400).json({ message: 'Security Alert: Order price mismatch detected.' });
+            }
+        } catch (validationError) {
+            console.error('Order Validation Error:', validationError);
+            return res.status(500).json({ message: 'Error validating order prices' });
+        }
+        // --- END LOOPHOLE FIX ---
+
         const { data: createdOrder, error } = await supabase
             .from('orders')
             .insert([{
@@ -29,7 +88,7 @@ const addOrderItems = async (req, res) => {
                 "paymentResult": req.body.paymentResult,
                 "taxPrice": taxPrice,
                 "shippingPrice": shippingPrice,
-                "totalPrice": totalPrice,
+                "totalPrice": totalPrice, // We know this matches expectedTotal now
                 "isPaid": true,
                 "paidAt": new Date().toISOString(),
                 "status": "Paid"

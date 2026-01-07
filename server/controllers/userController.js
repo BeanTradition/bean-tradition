@@ -72,7 +72,7 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const isAdmin = (email === 'beantradition@gmail.com' || email.includes('beantradition'));
+    const isAdmin = (email === 'beantradition@gmail.com');
 
     const { data: user, error } = await supabase
         .from('users')
@@ -182,7 +182,7 @@ const googleLogin = async (req, res) => {
             .single();
 
         if (!user) {
-            const isAdmin = (email === 'beantradition@gmail.com' || email.includes('beantradition'));
+            const isAdmin = (email === 'beantradition@gmail.com');
             const randomPassword = crypto.randomBytes(16).toString('hex');
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(randomPassword, salt);
