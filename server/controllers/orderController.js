@@ -123,21 +123,11 @@ const addOrderItems = async (req, res) => {
                 totalOrderWeight += (weightInGrams * quantity);
                 const totalGramsToDeduct = weightInGrams * quantity;
 
-                const { data: product, error: fetchError } = await supabase
-                    .from('products')
-                    .select('stock_weight_grams')
-                    .eq('id', productId)
-                    .single();
-
-                if (!fetchError && product) {
-                    const currentStock = product.stock_weight_grams || 0;
-                    const newStock = Math.max(0, currentStock - totalGramsToDeduct);
-
-                    await supabase
-                        .from('products')
-                        .update({ stock_weight_grams: newStock })
-                        .eq('id', productId);
-                }
+                // Atomic Update using RPC to prevent race conditions
+                await supabase.rpc('deduct_product_stock', {
+                    p_id: productId,
+                    p_amount: totalGramsToDeduct
+                });
             }
         } catch (stockError) {
             console.error('Stock Deduction Error:', stockError);
