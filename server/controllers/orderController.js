@@ -202,8 +202,13 @@ const getOrderById = async (req, res) => {
         .single();
 
     if (order) {
+        // --- LOOPHOLE FIX: Order Snooping ---
+        if (!req.user.isAdmin && order.user_id !== req.user.id) {
+            return res.status(401).json({ message: 'Not authorized to view this order' });
+        }
+        // --- END FIX ---
+
         // Transform 'users' back to 'user' for compatibility if needed or handle in frontend
-        // Mongoose populated 'user'. Supabase returns 'users' object.
         const transformedOrder = {
             ...order,
             user: order.users, // standardizing
@@ -220,6 +225,20 @@ const getOrderById = async (req, res) => {
 // @access  Private
 const updateOrderToPaid = async (req, res) => {
     const { id } = req.params;
+
+    const { data: order } = await supabase
+        .from('orders')
+        .select('user_id')
+        .eq('id', id)
+        .single();
+
+    if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+    }
+
+    if (!req.user.isAdmin && order.user_id !== req.user.id) {
+        return res.status(401).json({ message: 'Not authorized to update this order' });
+    }
 
     const { data: updatedOrder, error } = await supabase
         .from('orders')
