@@ -74,6 +74,21 @@ function App() {
   };
 
   const addToCart = (newItem: CartItem) => {
+    // --- GA4 Add to Cart Tracking ---
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'add_to_cart', {
+        currency: 'INR',
+        value: newItem.selectedVariant.price * newItem.quantity,
+        items: [{
+          item_id: newItem.id,
+          item_name: newItem.name,
+          item_variant: newItem.selectedVariant.weight,
+          price: newItem.selectedVariant.price,
+          quantity: newItem.quantity
+        }]
+      });
+    }
+
     setCart(prev => {
       const existing = prev.find(item =>
         item.id === newItem.id &&
@@ -94,6 +109,38 @@ function App() {
       return [...prev, newItem];
     });
   };
+
+  // Tracking for View Item and Begin Checkout
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      if (isModalOpen && selectedProduct) {
+        (window as any).gtag('event', 'view_item', {
+          currency: 'INR',
+          value: selectedProduct.variants[0]?.price || 0,
+          items: [{
+            item_id: selectedProduct.id,
+            item_name: selectedProduct.name,
+            item_category: selectedProduct.category,
+            price: selectedProduct.variants[0]?.price || 0
+          }]
+        });
+      }
+      if (view === AppView.CHECKOUT) {
+        (window as any).gtag('event', 'begin_checkout', {
+          currency: 'INR',
+          value: cart.reduce((acc, item) => acc + (item.selectedVariant.price * item.quantity), 0),
+          items: cart.map((item, index) => ({
+            item_id: item.id,
+            item_name: item.name,
+            index: index,
+            item_variant: item.selectedVariant.weight,
+            price: item.selectedVariant.price,
+            quantity: item.quantity
+          }))
+        });
+      }
+    }
+  }, [isModalOpen, view, selectedProduct]);
 
   const updateQuantityComposite = (compositeId: string, delta: number) => {
     setCart(prev => prev.map(item => {

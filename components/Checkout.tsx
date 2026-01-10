@@ -209,6 +209,28 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
               };
 
               await createOrder(newOrder);
+
+              // --- GA4 Ecommerce Tracking ---
+              if (typeof window !== 'undefined' && (window as any).gtag) {
+                (window as any).gtag('event', 'purchase', {
+                  transaction_id: response.razorpay_payment_id,
+                  value: total,
+                  currency: 'INR',
+                  tax: 0,
+                  shipping: shipping,
+                  coupon: appliedCoupon ? appliedCoupon.code : '',
+                  items: cart.map((item, index) => ({
+                    item_id: item.id,
+                    item_name: item.name,
+                    index: index,
+                    item_variant: item.selectedVariant.weight,
+                    price: item.selectedVariant.price,
+                    quantity: item.quantity
+                  }))
+                });
+              }
+              // --- End Tracking ---
+
               onSuccess();
             } else {
               alert("Payment verification failed.");
