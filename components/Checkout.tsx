@@ -182,7 +182,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
                   image: item.image,
                   price: item.selectedVariant.price,
                   weight: item.selectedVariant.weight,
-                  product: item._id || item.id
+                  intensity: item.selectedIntensity || null,
+                  roast: item.selectedRoast || null,
+                  product: item.id
                 })),
                 shippingAddress: {
                   address: formData.address,

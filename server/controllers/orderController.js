@@ -153,7 +153,12 @@ const addOrderItems = async (req, res) => {
 
         // Create Delhivery Shipment
         try {
-            const productsDesc = orderItems.map(item => `${item.name} (${item.quantity})`).join(', ');
+            const productsDesc = orderItems.map(item => {
+                let detail = item.name;
+                if (item.roast) detail += ` - ${item.roast} Roast`;
+                if (item.intensity) detail += ` [${item.intensity}]`;
+                return `${detail} (${item.quantity})`;
+            }).join(', ');
 
             await delhiveryService.createShipment({
                 name: shippingAddress.name || req.user.name,
