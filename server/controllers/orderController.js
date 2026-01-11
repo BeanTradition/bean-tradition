@@ -153,6 +153,8 @@ const addOrderItems = async (req, res) => {
 
         // Create Delhivery Shipment
         try {
+            const productsDesc = orderItems.map(item => `${item.name} (${item.quantity})`).join(', ');
+
             await delhiveryService.createShipment({
                 name: shippingAddress.name || req.user.name,
                 address: shippingAddress.address,
@@ -160,7 +162,8 @@ const addOrderItems = async (req, res) => {
                 phone: shippingAddress.phone,
                 orderId: createdOrder.id,
                 amount: totalPrice,
-                weight: totalOrderWeight
+                weight: totalOrderWeight,
+                productsDesc: productsDesc
             });
         } catch (delhiveryError) {
             console.error('Delhivery Shipment Error:', delhiveryError);

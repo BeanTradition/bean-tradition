@@ -83,7 +83,8 @@ class DelhiveryService {
                         payment_mode: "Prepaid",
                         shipping_mode: "Surface",
                         total_amount: orderData.amount.toString(),
-                        weight: orderData.weight || 500
+                        weight: orderData.weight || 500,
+                        products_desc: orderData.productsDesc || "Coffee Products"
                     }
                 ],
                 pickup_location: {
