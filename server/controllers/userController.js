@@ -359,8 +359,8 @@ const resetPassword = async (req, res) => {
 const getUsers = async (req, res) => {
     const { data: users, error } = await supabase
         .from('users')
-        .select('id, name, email, phone, isAdmin, joinedDate')
-        .order('joinedDate', { ascending: false });
+        .select('id, name, email, phone, isAdmin, joinedDate:created_at')
+        .order('created_at', { ascending: false });
 
     if (error) {
         return res.status(500).json({ message: error.message });
