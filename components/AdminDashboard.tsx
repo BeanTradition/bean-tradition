@@ -356,8 +356,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                             })()}
                                         </td>
                                         <td className="p-4">
-                                            <div className="font-bold">{order.customer?.name || (order as any).user?.name || 'Guest'}</div>
-                                            <div className="text-xs text-gray-500">{order.customer?.email || (order as any).user?.email}</div>
+                                            <div className="font-bold">
+                                                {(order as any).shippingAddress?.name || (order as any).user?.name || 'Guest'}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                {(order as any).paymentResult?.email_address || (order as any).user?.email}
+                                            </div>
                                             {(order as any).shippingAddress?.phone && (
                                                 <div className="text-[10px] text-coffee-600 mt-1">📞 {(order as any).shippingAddress.phone}</div>
                                             )}

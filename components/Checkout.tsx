@@ -187,6 +187,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ cart, onBack, onSuccess, cur
                   product: item.id
                 })),
                 shippingAddress: {
+                  name: formData.name,
                   address: formData.address,
                   city: formData.city,
                   pincode: formData.pincode,
