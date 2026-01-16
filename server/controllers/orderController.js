@@ -109,7 +109,8 @@ const addOrderItems = async (req, res) => {
                 "totalPrice": totalPrice, // We know this matches expectedTotal now
                 "isPaid": true,
                 "paidAt": new Date().toISOString(),
-                "status": "Paid"
+                "status": "Paid",
+                "user_name": req.user.name // Store name at top level for Supabase visibility
             }])
             .select()
             .single();
@@ -300,7 +301,8 @@ const getMyOrders = async (req, res) => {
     const { data: orders, error } = await supabase
         .from('orders')
         .select('*')
-        .eq('user_id', req.user.id);
+        .eq('user_id', req.user.id)
+        .order('created_at', { ascending: false });
 
     if (error) {
         res.status(500).json({ message: 'Error fetching orders' });
