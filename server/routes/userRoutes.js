@@ -8,10 +8,13 @@ const {
     googleLogin,
     forgotPassword,
     resetPassword,
+    getUsers,
 } = require('../controllers/userController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, admin } = require('../middleware/authMiddleware');
 
-router.post('/', registerUser);
+router.route('/')
+    .post(registerUser)
+    .get(protect, admin, getUsers);
 router.post('/login', authUser);
 router.post('/google-login', googleLogin);
 router.post('/forgotpassword', forgotPassword);

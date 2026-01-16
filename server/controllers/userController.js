@@ -353,4 +353,22 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { authUser, registerUser, getUserProfile, updateUserProfile, googleLogin, forgotPassword, resetPassword };
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+const getUsers = async (req, res) => {
+    const { data: users, error } = await supabase
+        .from('users')
+        .select('id, name, email, phone, isAdmin, joinedDate')
+        .order('joinedDate', { ascending: false });
+
+    if (error) {
+        return res.status(500).json({ message: error.message });
+    }
+
+    // Map _id for compatibility
+    const mappedUsers = users.map(u => ({ ...u, _id: u.id }));
+    res.json(mappedUsers);
+};
+
+module.exports = { authUser, registerUser, getUserProfile, updateUserProfile, googleLogin, forgotPassword, resetPassword, getUsers };

@@ -107,6 +107,11 @@ export const getAllOrders = async (): Promise<Order[]> => {
     return data;
 };
 
+export const getAllUsers = async (): Promise<User[]> => {
+    const { data } = await api.get('/users');
+    return data;
+};
+
 export const deliverOrder = async (id: string): Promise<Order> => {
     const { data } = await api.put(`/orders/${id}/deliver`);
     return data;

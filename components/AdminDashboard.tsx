@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import { getAllOrders, fetchProducts, deleteProduct as apiDeleteProduct, createProduct, updateProduct, getCoupons, createCoupon, updateCouponStatus, deleteCoupon as apiDeleteCoupon } from '../services/api';
-import { Order, Product, Coupon } from '../types';
+import { getAllOrders, getAllUsers, deliverOrder, fetchProducts, deleteProduct as apiDeleteProduct, createProduct, updateProduct, getCoupons, createCoupon, updateCouponStatus, deleteCoupon as apiDeleteCoupon } from '../services/api';
+import { Order, Product, Coupon, User } from '../types';
 
 interface AdminDashboardProps {
     onBack: () => void;
@@ -12,7 +12,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
     const [orders, setOrders] = useState<Order[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
     const [coupons, setCoupons] = useState<Coupon[]>([]);
-    const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'coupons'>('orders');
+    const [users, setUsers] = useState<User[]>([]);
+    const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'coupons' | 'users'>('orders');
     const [loading, setLoading] = useState(true);
     const [isAddingProduct, setIsAddingProduct] = useState(false);
     const [newProduct, setNewProduct] = useState({
@@ -47,14 +48,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
     const loadData = async () => {
         setLoading(true);
         try {
-            const [ordersData, productsData, couponsData] = await Promise.all([
+            const [ordersData, productsData, couponsData, usersData] = await Promise.all([
                 getAllOrders(),
                 fetchProducts(),
-                getCoupons()
+                getCoupons(),
+                getAllUsers()
             ]);
             setOrders(ordersData);
             setProducts(productsData);
             setCoupons(couponsData);
+            setUsers(usersData);
         } catch (error) {
             console.error(error);
             alert("Failed to load admin data");
@@ -208,6 +211,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                         className={`px-6 py-3 rounded-lg font-bold ${activeTab === 'coupons' ? 'bg-coffee-900 text-white' : 'bg-white text-coffee-900'}`}
                     >
                         Coupons ({coupons.length})
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('users')}
+                        className={`px-6 py-3 rounded-lg font-bold ${activeTab === 'users' ? 'bg-coffee-900 text-white' : 'bg-white text-coffee-900'}`}
+                    >
+                        Users ({users.length})
                     </button>
                 </div>
 
@@ -589,6 +598,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                )}
+                {activeTab === 'users' && (
+                    <div className="bg-white rounded-xl shadow overflow-hidden">
+                        <table className="w-full text-left">
+                            <thead className="bg-coffee-50 border-b">
+                                <tr>
+                                    <th className="p-4 font-bold text-coffee-900">Joined Date</th>
+                                    <th className="p-4 font-bold text-coffee-900">Name</th>
+                                    <th className="p-4 font-bold text-coffee-900">Email</th>
+                                    <th className="p-4 font-bold text-coffee-900">Phone</th>
+                                    <th className="p-4 font-bold text-coffee-900">Role</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y">
+                                {users.map(user => (
+                                    <tr key={user.id || (user as any)._id} className="hover:bg-gray-50">
+                                        <td className="p-4 text-xs font-mono text-gray-500">
+                                            {user.joinedDate ? new Date(user.joinedDate).toLocaleDateString('en-IN') : '-'}
+                                        </td>
+                                        <td className="p-4 font-bold text-coffee-900">{user.name}</td>
+                                        <td className="p-4 text-sm">{user.email}</td>
+                                        <td className="p-4 text-sm">{user.phone || '-'}</td>
+                                        <td className="p-4">
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${user.isAdmin ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-600'}`}>
+                                                {user.isAdmin ? 'Admin' : 'Customer'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </div>

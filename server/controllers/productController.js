@@ -6,7 +6,8 @@ const supabase = require('../config/supabaseClient');
 const getProducts = async (req, res) => {
     const { data: products, error } = await supabase
         .from('products')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false });
 
     if (error) {
         console.error(error);
