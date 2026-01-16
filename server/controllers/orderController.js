@@ -315,7 +315,8 @@ const getMyOrders = async (req, res) => {
 const getOrders = async (req, res) => {
     const { data: orders, error } = await supabase
         .from('orders')
-        .select('*, users(id, name)'); // Join to get user name
+        .select('*, users(id, name)')
+        .order('created_at', { ascending: false }); // Newest first
 
     if (error) {
         res.status(500).json({ message: error.message });

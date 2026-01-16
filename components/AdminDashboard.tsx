@@ -349,16 +349,50 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                         <td className="p-4">
                                             <div className="font-bold">{order.customer?.name || (order as any).user?.name || 'Guest'}</div>
                                             <div className="text-xs text-gray-500">{order.customer?.email || (order as any).user?.email}</div>
+                                            {(order as any).shippingAddress?.phone && (
+                                                <div className="text-[10px] text-coffee-600 mt-1">📞 {(order as any).shippingAddress.phone}</div>
+                                            )}
                                         </td>
                                         <td className="p-4 font-bold">₹{order.total || order.totalPrice}</td>
-                                        <td className="p-4 text-sm">{order.items?.length || (order as any).orderItems?.length} items</td>
                                         <td className="p-4">
-                                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
-                                                order.status === 'Paid' ? 'bg-blue-100 text-blue-800' :
-                                                    'bg-yellow-100 text-yellow-800'
-                                                }`}>
-                                                {order.status || 'Pending'}
-                                            </span>
+                                            <div className="flex flex-col gap-1 max-w-[200px]">
+                                                {((order as any).orderItems || order.items || []).map((item: any, i: number) => (
+                                                    <div key={i} className="text-[10px] bg-coffee-50 p-1.5 rounded border border-coffee-100/50 leading-tight">
+                                                        <div className="flex justify-between items-start gap-2">
+                                                            <span className="font-bold text-coffee-900 truncate">{item.name}</span>
+                                                            <span className="bg-coffee-900 text-white px-1 rounded-sm flex-shrink-0">x{item.quantity}</span>
+                                                        </div>
+                                                        <div className="text-[9px] text-coffee-500 mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">
+                                                            {item.weight}{item.roast ? ` • ${item.roast} Roast` : ''}{item.intensity ? ` • Int: ${item.intensity}` : ''}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex flex-col gap-1">
+                                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase text-center ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                                                    order.status === 'Paid' || order.status === 'Shipped' ? 'bg-blue-100 text-blue-800' :
+                                                        'bg-yellow-100 text-yellow-800'
+                                                    }`}>
+                                                    {order.status || 'Pending'}
+                                                </span>
+                                                {order.status === 'Paid' && (
+                                                    <button
+                                                        onClick={async () => {
+                                                            if (window.confirm("Mark as Delivered?")) {
+                                                                try {
+                                                                    await deliverOrder(order.id || (order as any)._id);
+                                                                    loadData();
+                                                                } catch (err) { alert("Failed to mark delivered"); }
+                                                            }
+                                                        }}
+                                                        className="text-[9px] font-bold text-coffee-600 underline hover:text-gold-600 uppercase"
+                                                    >
+                                                        Mark Delivered
+                                                    </button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
