@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Order, User, CartItem } from '../types';
 
-export const generateInvoice = (order: Order, user: User | null) => {
+export const generateInvoice = (order: any, user: any | null) => {
     try {
         const doc = new jsPDF() as any;
         const brandName = "Bean Tradition";
@@ -23,38 +23,45 @@ export const generateInvoice = (order: Order, user: User | null) => {
 
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
-        doc.text(`Order ID: ${order.id}`, 150, 36);
-        doc.text(`Date: ${order.date}`, 150, 42);
+        doc.text(`Order ID: ${order.id || order._id}`, 150, 36);
+        doc.text(`Date: ${order.date || new Date(order.created_at).toLocaleDateString()}`, 150, 42);
 
         // Horizontal Line
         doc.setDrawColor(210, 180, 140); // gold/coffee tint
         doc.line(20, 50, 190, 50);
 
-        // Billing Details
+        // Billing Details - Handle different property names (customer vs shippingAddress)
+        const customerInfo = order.customer || order.shippingAddress || {};
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
         doc.text("Bill To:", 20, 65);
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        doc.text(order.customer.name || user?.name || "Customer", 20, 72);
-        doc.text(order.customer.phone || user?.phone || "", 20, 77);
-        doc.text(order.customer.address || "", 20, 82);
-        doc.text(`${order.customer.city || ""}, ${order.customer.pincode || ""}`, 20, 87);
+        doc.text(customerInfo.name || order.user_name || user?.name || "Customer", 20, 72);
+        doc.text(customerInfo.phone || user?.phone || "", 20, 77);
+        doc.text(customerInfo.address || "", 20, 82);
+        doc.text(`${customerInfo.city || ""}, ${customerInfo.pincode || ""}`, 20, 87);
         doc.text("India", 20, 92);
 
         // Table
         const tableColumn = ["Product", "Weight", "Roast/Intensity", "Qty", "Price", "Subtotal"];
         const tableRows: any[] = [];
 
-        order.items.forEach((item: any) => {
+        // Correctly handle items vs orderItems
+        const items = order.items || order.orderItems || [];
+        items.forEach((item: any) => {
+            const price = item.price || (item.selectedVariant ? item.selectedVariant.price : 0);
+            const weight = item.weight || (item.selectedVariant ? item.selectedVariant.weight : '-');
+            const profile = (item.roast || item.selectedRoast || item.intensity || item.selectedIntensity || '-');
+
             const itemData = [
                 item.name,
-                item.selectedVariant.weight,
-                `${item.roast || item.selectedRoast || ''} ${item.intensity || item.selectedIntensity || ''}`.trim() || '-',
+                weight,
+                profile,
                 item.quantity,
-                `INR ${item.price || item.selectedVariant.price}`,
-                `INR ${(item.price || item.selectedVariant.price) * item.quantity}`
+                `INR ${price}`,
+                `INR ${price * item.quantity}`
             ];
             tableRows.push(itemData);
         });
@@ -71,16 +78,17 @@ export const generateInvoice = (order: Order, user: User | null) => {
         const finalY = (doc as any).lastAutoTable.finalY + 10;
 
         // Totals
+        const totalPrice = order.total || order.totalPrice || 0;
         doc.setFont("helvetica", "bold");
         doc.text("Summary", 140, finalY);
         doc.setFont("helvetica", "normal");
-        doc.text(`Items Price: INR ${(order as any).itemsPrice || (order as any).totalPrice || order.total}`, 140, finalY + 7);
-        doc.text(`Shipping: INR ${(order as any).shippingPrice || 0}`, 140, finalY + 14);
+        doc.text(`Subtotal: INR ${totalPrice}`, 140, finalY + 7);
+        doc.text(`Shipping: INR 0`, 140, finalY + 14);
 
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(44, 24, 16);
-        doc.text(`Total: INR ${order.total || (order as any).totalPrice}`, 140, finalY + 24);
+        doc.text(`Total: INR ${totalPrice}`, 140, finalY + 24);
 
         // Footer
         doc.setFontSize(10);
@@ -88,10 +96,10 @@ export const generateInvoice = (order: Order, user: User | null) => {
         doc.text("Thank you for choosing Bean Tradition!", 105, 280, { align: "center" });
         doc.text("www.beantradition.in", 105, 285, { align: "center" });
 
-        doc.save(`Invoice_BeanTradition_${order.id}.pdf`);
-    } catch (err) {
+        doc.save(`Invoice_BT_${order.id || order._id}.pdf`);
+    } catch (err: any) {
         console.error("Invoice Error:", err);
-        alert("Failed to generate invoice. Please contact support.");
+        alert(`Error: ${err.message || 'Check console for details'}`);
     }
 };
 
@@ -115,8 +123,8 @@ export const generateCustomerReport = (orders: any[], customer: any) => {
                 order.id || order._id,
                 new Date(order.created_at || order.date).toLocaleDateString(),
                 order.status,
-                order.orderItems?.length || order.items?.length,
-                `INR ${order.totalPrice || order.total}`
+                (order.orderItems?.length || order.items?.length || 0),
+                `INR ${order.totalPrice || order.total || 0}`
             ]);
         });
 
@@ -128,7 +136,7 @@ export const generateCustomerReport = (orders: any[], customer: any) => {
             headStyles: { fillColor: [44, 24, 16] }
         });
 
-        const totalSpent = orders.reduce((acc, curr) => acc + (curr.totalPrice || curr.total), 0);
+        const totalSpent = orders.reduce((acc, curr) => acc + (curr.totalPrice || curr.total || 0), 0);
         const finalY = (doc as any).lastAutoTable.finalY + 15;
 
         doc.setFontSize(14);
@@ -136,7 +144,7 @@ export const generateCustomerReport = (orders: any[], customer: any) => {
         doc.text(`Total Lifetime Value: INR ${totalSpent}`, 20, finalY + 8);
 
         doc.save(`Report_${customer.name.replace(/\s+/g, '_')}.pdf`);
-    } catch (err) {
+    } catch (err: any) {
         console.error("Report Error:", err);
         alert("Failed to generate report.");
     }
