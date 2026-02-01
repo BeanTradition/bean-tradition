@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllOrders, getAllUsers, deliverOrder, fetchProducts, deleteProduct as apiDeleteProduct, createProduct, updateProduct, getCoupons, createCoupon, updateCouponStatus, deleteCoupon as apiDeleteCoupon } from '../services/api';
 import { Order, Product, Coupon, User } from '../types';
+import { generateInvoice, generateCustomerReport } from '../utils/pdfGenerator';
 
 interface AdminDashboardProps {
     onBack: () => void;
@@ -426,6 +427,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                                         Mark Delivered
                                                     </button>
                                                 )}
+                                                <button
+                                                    onClick={() => generateInvoice(order, (order as any).user)}
+                                                    className="text-[9px] font-bold text-gold-600 underline hover:text-coffee-900 uppercase mt-1"
+                                                >
+                                                    Download Invoice
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -640,6 +647,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                     <th className="p-4 font-bold text-coffee-900">Email</th>
                                     <th className="p-4 font-bold text-coffee-900">Phone</th>
                                     <th className="p-4 font-bold text-coffee-900">Role</th>
+                                    <th className="p-4 font-bold text-coffee-900">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y">
@@ -655,6 +663,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${user.isAdmin ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-600'}`}>
                                                 {user.isAdmin ? 'Admin' : 'Customer'}
                                             </span>
+                                        </td>
+                                        <td className="p-4">
+                                            <button
+                                                onClick={() => {
+                                                    const userOrders = orders.filter(o => (o as any).user_id === user.id || (o as any).user?.email === user.email);
+                                                    generateCustomerReport(userOrders, user);
+                                                }}
+                                                className="text-[10px] font-bold text-gold-600 hover:text-coffee-900 uppercase border border-gold-200 px-3 py-1 rounded"
+                                            >
+                                                Download Report
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}

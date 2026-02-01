@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, Order } from '../types';
+import { generateInvoice } from '../utils/pdfGenerator';
 
 interface ProfileProps {
   user: User;
@@ -120,6 +121,13 @@ export const Profile: React.FC<ProfileProps> = ({ user, onBack, onLogout }) => {
                               {order.status}
                             </span>
                             <p className="text-lg font-serif font-bold text-coffee-900">₹{order.total}</p>
+                            <button
+                              onClick={() => generateInvoice(order, user)}
+                              className="mt-2 text-[10px] font-bold text-gold-600 flex items-center gap-1 hover:text-coffee-900 transition-colors uppercase tracking-widest"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                              Download Invoice
+                            </button>
                           </div>
                         </div>
                       </div>
