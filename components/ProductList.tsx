@@ -120,12 +120,21 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white/95 px-2 md:px-4 py-1 md:py-2 text-[8px] md:text-xs font-bold uppercase tracking-tighter md:tracking-widest text-coffee-900 shadow-sm backdrop-blur-sm rounded-sm">
                   {product.category === 'Beans' ? `${product.roast} Roast` : (product.category === 'Filter Powder' ? 'Filter' : product.category)}
                 </div>
-                {/* Out of Stock Overlay */}
-                {product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0 && (
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
-                    <span className="bg-red-600 text-white px-3 py-1 rounded text-[10px] md:text-sm font-bold uppercase tracking-widest shadow-lg">Out of Stock</span>
-                  </div>
-                )}
+                {/* Out of Stock Overlay - Only if ALL profiles are empty */}
+                {(() => {
+                  const hasStock = (product as any).stock_by_profile
+                    ? Object.values((product as any).stock_by_profile).some((s: any) => s > 0)
+                    : (product.stock_weight_grams || 0) > 0;
+
+                  if (!hasStock) {
+                    return (
+                      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                        <span className="bg-red-600 text-white px-3 py-1 rounded text-[10px] md:text-sm font-bold uppercase tracking-widest shadow-lg">Out of Stock</span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
 
               <div className="p-4 md:p-8 flex flex-col flex-grow bg-white relative">
@@ -135,13 +144,20 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                     const defaultVariant = product.variants[0];
                     const currentIntensity = getIntensity(product.id);
                     const currentRoast = getRoast(product.id, product.roast);
+                    const profileKey = product.category === 'Beans' ? currentRoast : currentIntensity;
+
                     const cartItem = cart.find(item =>
                       item.id === product.id &&
                       item.selectedVariant.weight === defaultVariant.weight &&
                       (!item.selectedIntensity || item.selectedIntensity === currentIntensity) &&
                       (!item.selectedRoast || item.selectedRoast === currentRoast)
                     );
-                    const isOutOfStock = product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0;
+
+                    const profileStock = (product as any).stock_by_profile?.[profileKey];
+                    // If detailed stock exists, use it. Otherwise fallback to global grams.
+                    const isOutOfStock = profileStock !== undefined
+                      ? profileStock <= 0
+                      : (product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0);
 
                     if (cartItem) {
                       const compositeId = `${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}${cartItem.selectedRoast ? `-${cartItem.selectedRoast}` : ''}`;
@@ -178,7 +194,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                             onQuickAdd({ ...product, selectedIntensity: intensity, selectedRoast: roast } as any, v);
                           }
                         }}
-                        className={`absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 ${isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110'}`}
+                        className={`absolute -top-4 right-4 md:-top-6 md:right-8 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full shadow-lg text-sm md:text-lg font-bold z-10 transition-all duration-300 ${isOutOfStock ? 'bg-gray-400 cursor-not-allowed text-white/50' : 'bg-gold-500 text-white group-hover:bg-coffee-900 group-hover:scale-110'}`}
                       >
                         {isOutOfStock ? '!' : '+'}
                       </button>
@@ -214,18 +230,23 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 {mode === 'shop' && (product.category === 'Filter Powder' || product.category === 'Instant') && (
                   <div className="mb-4" onClick={e => e.stopPropagation()}>
                     <div className="flex gap-1">
-                      {(['Light', 'Medium', 'Strong'] as const).map((int) => (
-                        <button
-                          key={int}
-                          onClick={() => setIntensities(prev => ({ ...prev, [product.id]: int }))}
-                          className={`flex-1 py-1 text-[8px] md:text-[10px] font-bold uppercase border rounded-sm transition-all ${getIntensity(product.id) === int
-                            ? 'bg-coffee-900 text-white border-coffee-900'
-                            : 'bg-white text-coffee-600 border-gray-200 hover:border-gold-300'
-                            }`}
-                        >
-                          {int}
-                        </button>
-                      ))}
+                      {(['Light', 'Medium', 'Strong'] as const).map((int) => {
+                        const profileStock = (product as any).stock_by_profile?.[int];
+                        const isProfileOut = profileStock !== undefined ? profileStock <= 0 : false;
+
+                        return (
+                          <button
+                            key={int}
+                            onClick={() => setIntensities(prev => ({ ...prev, [product.id]: int }))}
+                            className={`flex-1 py-1 text-[8px] md:text-[10px] font-bold uppercase border rounded-sm transition-all ${getIntensity(product.id) === int
+                              ? 'bg-coffee-900 text-white border-coffee-900'
+                              : 'bg-white text-coffee-600 border-gray-200 hover:border-gold-300'
+                              } ${isProfileOut ? 'opacity-40 line-through' : ''}`}
+                          >
+                            {int}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -234,18 +255,23 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 {mode === 'shop' && product.category === 'Beans' && (
                   <div className="mb-4" onClick={e => e.stopPropagation()}>
                     <div className="flex gap-1">
-                      {(['Light', 'Medium', 'Dark'] as const).map((rst) => (
-                        <button
-                          key={rst}
-                          onClick={() => setRoasts(prev => ({ ...prev, [product.id]: rst }))}
-                          className={`flex-1 py-1 text-[8px] md:text-[10px] font-bold uppercase border rounded-sm transition-all ${getRoast(product.id, product.roast) === rst
-                            ? 'bg-coffee-900 text-white border-coffee-900'
-                            : 'bg-white text-coffee-600 border-gray-200 hover:border-gold-300'
-                            }`}
-                        >
-                          {rst}
-                        </button>
-                      ))}
+                      {(['Light', 'Medium', 'Dark'] as const).map((rst) => {
+                        const profileStock = (product as any).stock_by_profile?.[rst];
+                        const isProfileOut = profileStock !== undefined ? profileStock <= 0 : false;
+
+                        return (
+                          <button
+                            key={rst}
+                            onClick={() => setRoasts(prev => ({ ...prev, [product.id]: rst }))}
+                            className={`flex-1 py-1 text-[8px] md:text-[10px] font-bold uppercase border rounded-sm transition-all ${getRoast(product.id, product.roast) === rst
+                              ? 'bg-coffee-900 text-white border-coffee-900'
+                              : 'bg-white text-coffee-600 border-gray-200 hover:border-gold-300'
+                              } ${isProfileOut ? 'opacity-40 line-through' : ''}`}
+                          >
+                            {rst}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -258,6 +284,8 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                       const defaultVariant = product.variants[0];
                       const currentIntensity = getIntensity(product.id);
                       const currentRoast = getRoast(product.id, product.roast);
+                      const profileKey = product.category === 'Beans' ? currentRoast : currentIntensity;
+
                       const cartItem = cart.find(item =>
                         item.id === product.id &&
                         item.selectedVariant.weight === defaultVariant.weight &&
@@ -265,7 +293,10 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                         (!item.selectedRoast || item.selectedRoast === currentRoast)
                       );
 
-                      const isOutOfStock = product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0;
+                      const profileStock = (product as any).stock_by_profile?.[profileKey];
+                      const isOutOfStock = profileStock !== undefined
+                        ? profileStock <= 0
+                        : (product.stock_weight_grams !== undefined && product.stock_weight_grams <= 0);
 
                       if (cartItem) {
                         const compositeId = `${product.id}-${defaultVariant.weight}${cartItem.selectedIntensity ? `-${cartItem.selectedIntensity}` : ''}${cartItem.selectedRoast ? `-${cartItem.selectedRoast}` : ''}`;

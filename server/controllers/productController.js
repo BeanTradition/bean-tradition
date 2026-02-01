@@ -21,7 +21,8 @@ const getProducts = async (req, res) => {
         // Ensure variants is parsed if it comes as string (should be object from JSONB but just in case)
         variants: typeof p.variants === 'string' ? JSON.parse(p.variants) : p.variants,
         tags: typeof p.tags === 'string' ? JSON.parse(p.tags) : p.tags,
-        stock_weight_grams: p.stock_weight_grams || 0
+        stock_weight_grams: p.stock_weight_grams || 0,
+        stock_by_profile: typeof p.stock_by_profile === 'string' ? JSON.parse(p.stock_by_profile) : (p.stock_by_profile || {})
     }));
 
     res.json(mappedProducts);
@@ -64,7 +65,7 @@ const deleteProduct = async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = async (req, res) => {
-    const { name, image, category, countInStock, stock_weight_grams, numReviews, description, roast, intensity, variants } = req.body;
+    const { name, image, category, countInStock, stock_weight_grams, stock_by_profile, numReviews, description, roast, intensity, variants } = req.body;
 
     // Note: 'price' is not in my DB schema for top level, it is in variants usually, but frontend sends it?
     // Looking at Types.ts: Product has variants. Variants have price. 
@@ -85,7 +86,8 @@ const createProduct = async (req, res) => {
             roast,
             intensity,
             variants, // JSONB array
-            stock_weight_grams: stock_weight_grams || 0
+            stock_weight_grams: stock_weight_grams || 0,
+            stock_by_profile: stock_by_profile || {}
         }])
         .select()
         .single();
@@ -109,7 +111,8 @@ const updateProduct = async (req, res) => {
         roast,
         intensity,
         variants,
-        stock_weight_grams
+        stock_weight_grams,
+        stock_by_profile
     } = req.body;
 
     const { data: updatedProduct, error } = await supabase
@@ -122,7 +125,8 @@ const updateProduct = async (req, res) => {
             roast,
             intensity,
             variants,
-            stock_weight_grams
+            stock_weight_grams,
+            stock_by_profile
         })
         .eq('id', req.params.id)
         .select()

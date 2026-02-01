@@ -141,10 +141,13 @@ const addOrderItems = async (req, res) => {
 
                 totalOrderWeight += (weightInGrams * quantity);
                 const totalGramsToDeduct = weightInGrams * quantity;
+                const profileKey = item.roast || item.intensity || 'Default';
 
                 // Atomic Update using RPC to prevent race conditions
-                await supabase.rpc('deduct_product_stock', {
+                // We use the new deduct_detailed_stock which handles JSONB stock map
+                await supabase.rpc('deduct_detailed_stock', {
                     p_id: productId,
+                    p_key: profileKey,
                     p_amount: totalGramsToDeduct
                 });
             }

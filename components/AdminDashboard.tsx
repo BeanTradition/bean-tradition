@@ -27,7 +27,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
         tastingNotes: '',
         bestFor: '',
         variants: [{ weight: '250gm', price: 0 }],
-        stock_weight_grams: 5000 // Default 5kg
+        stock_weight_grams: 5000, // Default 5kg
+        stock_by_profile: {} as Record<string, number>
     });
 
     // Coupon Form State
@@ -86,7 +87,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                 tastingNotes: '',
                 bestFor: '',
                 variants: [{ weight: '250gm', price: 0 }],
-                stock_weight_grams: 5000
+                stock_weight_grams: 5000,
+                stock_by_profile: {}
             });
         } catch (error) {
             console.error(error);
@@ -283,9 +285,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                     <input required type="text" className="w-full border border-gray-200 p-3 rounded-lg focus:border-gold-500 outline-none font-mono text-sm" value={newProduct.image} onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Initial Stock (in Grams)</label>
-                                    <input required type="number" className="w-full border border-gray-200 p-3 rounded-lg focus:border-gold-500 outline-none font-mono text-sm" value={newProduct.stock_weight_grams} onChange={(e) => setNewProduct({ ...newProduct, stock_weight_grams: parseInt(e.target.value) })} />
-                                    <p className="text-[10px] text-gray-400 mt-1 uppercase italic">Example: 5000 = 5kg</p>
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Inventory by Profile (in Grams)</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {(newProduct.category === 'Beans' ? ['Light', 'Medium', 'Dark'] : ['Light', 'Medium', 'Strong']).map(profile => (
+                                            <div key={profile}>
+                                                <label className="block text-[10px] text-gray-400 mb-1">{profile}</label>
+                                                <input
+                                                    type="number"
+                                                    placeholder="Grams"
+                                                    className="w-full border border-gray-200 p-2 rounded text-xs"
+                                                    value={newProduct.stock_by_profile[profile] || 0}
+                                                    onChange={(e) => {
+                                                        const val = parseInt(e.target.value) || 0;
+                                                        setNewProduct({
+                                                            ...newProduct,
+                                                            stock_by_profile: { ...newProduct.stock_by_profile, [profile]: val }
+                                                        });
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-1 uppercase italic">Each selection on the shop page will deduct from these pools.</p>
                                 </div>
                             </div>
 
@@ -442,32 +463,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                     </div>
 
                                     <div className="bg-gold-50 p-3 rounded-lg mb-4 border border-gold-100">
-                                        <div className="flex justify-between items-center text-xs font-bold text-gold-800 uppercase tracking-tighter mb-1">
-                                            <div className="flex items-center gap-2">
-                                                <span>Current Stock</span>
-                                                {(product.stock_weight_grams || 0) < 1000 && (
-                                                    <span className="bg-red-500 text-white text-[8px] px-1 rounded animate-pulse">Low</span>
-                                                )}
-                                            </div>
-                                            <span>{(product.stock_weight_grams || 0) / 1000} KG</span>
+                                        <div className="flex justify-between items-center text-xs font-bold text-gold-800 uppercase tracking-tighter mb-2">
+                                            <span>Current Stock (Grams)</span>
+                                            <span className="bg-gold-200 px-2 py-0.5 rounded">Total: {((product as any).stock_by_profile ? Object.values((product as any).stock_by_profile).reduce((a: any, b: any) => a + (b || 0), 0) : product.stock_weight_grams || 0) / 1000} KG</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="number"
-                                                className="w-full bg-white border border-gold-200 text-xs p-1.5 rounded outline-none focus:border-gold-500"
-                                                defaultValue={product.stock_weight_grams}
-                                                onBlur={async (e) => {
-                                                    const newValue = parseInt(e.target.value);
-                                                    if (isNaN(newValue)) return;
-                                                    try {
-                                                        const updated = await updateProduct(product.id || product._id!, { stock_weight_grams: newValue });
-                                                        setProducts(prev => prev.map(p => p.id === (product.id || product._id) ? updated : p));
-                                                    } catch (err) {
-                                                        alert("Failed to update stock");
-                                                    }
-                                                }}
-                                            />
-                                            <span className="text-[10px] text-gold-600 font-bold uppercase">Grams</span>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {(product.category === 'Beans' ? ['Light', 'Medium', 'Dark'] : ['Light', 'Medium', 'Strong']).map(profile => (
+                                                <div key={profile}>
+                                                    <label className="block text-[8px] text-gold-600 uppercase font-bold mb-0.5">{profile}</label>
+                                                    <input
+                                                        type="number"
+                                                        className="w-full bg-white border border-gold-200 text-[10px] p-1 rounded outline-none focus:border-gold-500"
+                                                        defaultValue={(product as any).stock_by_profile?.[profile] || 0}
+                                                        onBlur={async (e) => {
+                                                            const newValue = parseInt(e.target.value) || 0;
+                                                            try {
+                                                                const currentStocks = (product as any).stock_by_profile || {};
+                                                                const updatedStocks = { ...currentStocks, [profile]: newValue };
+                                                                const totalGrams = Object.values(updatedStocks).reduce((a: any, b: any) => a + (b || 0), 0) as number;
+
+                                                                const updated = await updateProduct(product.id || product._id!, {
+                                                                    stock_by_profile: updatedStocks,
+                                                                    stock_weight_grams: totalGrams
+                                                                });
+                                                                setProducts(prev => prev.map(p => p.id === (product.id || product._id) ? updated : p));
+                                                            } catch (err) {
+                                                                alert("Failed to update stock");
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
 
