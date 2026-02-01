@@ -366,18 +366,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                         <table className="w-full text-left">
                             <thead className="bg-coffee-50 border-b">
                                 <tr>
-                                    <th className="p-4 font-bold text-coffee-900">Order ID</th>
+                                    <th className="p-4 font-bold text-coffee-900">Order No.</th>
                                     <th className="p-4 font-bold text-coffee-900">Date</th>
                                     <th className="p-4 font-bold text-coffee-900">Customer</th>
-                                    <th className="p-4 font-bold text-coffee-900">Total</th>
                                     <th className="p-4 font-bold text-coffee-900">Items</th>
+                                    <th className="p-4 font-bold text-coffee-900">Amount</th>
                                     <th className="p-4 font-bold text-coffee-900">Status</th>
+                                    <th className="p-4 font-bold text-coffee-900">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y">
                                 {orders.map(order => (
-                                    <tr key={order.id || (order as any)._id} className="hover:bg-gray-50">
-                                        <td className="p-4 font-mono text-xs">{order.id}</td>
+                                    <tr key={order.id || (order as any)._id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="p-4">
+                                            <p className="font-bold text-coffee-900 text-xs">{(order as any).order_number || order.id || (order as any)._id}</p>
+                                        </td>
                                         <td className="p-4 text-sm font-mono text-gray-600">
                                             {(() => {
                                                 const dateStr = (order as any).created_at || order.date;
@@ -402,7 +405,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                                 <div className="text-[10px] text-coffee-600 mt-1">📞 {(order as any).shippingAddress.phone}</div>
                                             )}
                                         </td>
-                                        <td className="p-4 font-bold">₹{order.total || order.totalPrice}</td>
                                         <td className="p-4">
                                             <div className="flex flex-col gap-1 max-w-[200px]">
                                                 {((order as any).orderItems || order.items || []).map((item: any, i: number) => (
@@ -412,12 +414,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                                             <span className="bg-coffee-900 text-white px-1 rounded-sm flex-shrink-0">x{item.quantity}</span>
                                                         </div>
                                                         <div className="text-[9px] text-coffee-500 mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">
-                                                            {item.weight}{item.roast ? ` • ${item.roast} Roast` : ''}{item.intensity ? ` • Int: ${item.intensity}` : ''}
+                                                            {item.weight || item.selectedVariant?.weight}{item.roast ? ` • ${item.roast} Roast` : ''}{item.intensity ? ` • Int: ${item.intensity}` : ''}
                                                         </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         </td>
+                                        <td className="p-4 font-bold whitespace-nowrap text-coffee-900">₹{order.total || order.totalPrice}</td>
                                         <td className="p-4">
                                             <div className="flex flex-col gap-1">
                                                 <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase text-center ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' :

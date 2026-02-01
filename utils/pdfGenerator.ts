@@ -23,8 +23,9 @@ export const generateInvoice = (order: any, user: any | null) => {
 
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
-        doc.text(`Order ID: ${order.id || order._id}`, 150, 36);
+        doc.text(`Order Number: ${order.order_number || order.id || order._id}`, 150, 36);
         doc.text(`Date: ${order.date || new Date(order.created_at).toLocaleDateString()}`, 150, 42);
+        doc.text(`Invoice No: ${order.order_number || order.id || order._id}`, 150, 48);
 
         // Horizontal Line
         doc.setDrawColor(210, 180, 140); // gold/coffee tint
@@ -96,7 +97,7 @@ export const generateInvoice = (order: any, user: any | null) => {
         doc.text("Thank you for choosing Bean Tradition!", 105, 280, { align: "center" });
         doc.text("www.beantradition.in", 105, 285, { align: "center" });
 
-        doc.save(`Invoice_BT_${order.id || order._id}.pdf`);
+        doc.save(`Invoice_${order.order_number || order.id || order._id}.pdf`);
     } catch (err: any) {
         console.error("Invoice Error:", err);
         alert(`Error: ${err.message || 'Check console for details'}`);

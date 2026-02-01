@@ -19,6 +19,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onBack, onLogout }) => {
         // Backend returns different structure, map it
         const mappedOrders: any[] = myOrders.map((o: any) => ({
           id: o._id || o.id,
+          order_number: o.order_number,
           date: new Date(o.created_at).toLocaleDateString(),
           status: o.status,
           total: o.totalPrice,
@@ -109,7 +110,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onBack, onLogout }) => {
                     <div key={order.id} className="border border-coffee-50 rounded-lg p-6 hover:shadow-md transition-shadow">
                       <div className="flex flex-col md:flex-row justify-between gap-4 mb-8 border-b border-gray-100 pb-4">
                         <div>
-                          <p className="text-[10px] font-mono font-bold text-gray-400 uppercase">{order.id}</p>
+                          <p className="text-[10px] font-mono font-bold text-gray-400 uppercase">{order.order_number || order.id}</p>
                           <p className="text-sm font-bold text-coffee-900">{order.date.split(',')[0]}</p>
                         </div>
                         <div className="flex items-center gap-6">
