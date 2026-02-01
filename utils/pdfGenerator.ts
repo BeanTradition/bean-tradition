@@ -149,3 +149,71 @@ export const generateCustomerReport = (orders: any[], customer: any) => {
         alert("Failed to generate report.");
     }
 };
+
+export const generateMonthlySalesReport = (orders: any[]) => {
+    try {
+        const doc = new jsPDF() as any;
+        const now = new Date();
+        const monthName = now.toLocaleString('default', { month: 'long' });
+        const year = now.getFullYear();
+
+        doc.setFontSize(22);
+        doc.setTextColor(44, 24, 16);
+        doc.text("Sales Report", 20, 30);
+
+        doc.setFontSize(12);
+        doc.setTextColor(150, 150, 150);
+        doc.text(`Period: ${monthName} ${year}`, 20, 38);
+
+        // Filter orders for the current month
+        const currentMonthOrders = orders.filter(order => {
+            const date = new Date(order.created_at || order.date);
+            return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+        });
+
+        // Summary Stats
+        const totalRevenue = currentMonthOrders.reduce((acc, curr) => acc + (curr.totalPrice || curr.total || 0), 0);
+        const paidOrders = currentMonthOrders.filter(o => o.status === 'Paid' || o.status === 'Delivered');
+        const pendingOrders = currentMonthOrders.filter(o => o.status === 'Pending');
+
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Total Orders: ${currentMonthOrders.length}`, 20, 55);
+        doc.text(`Successful Sales: ${paidOrders.length}`, 20, 60);
+        doc.text(`Pending Orders: ${pendingOrders.length}`, 20, 65);
+
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Total Revenue: INR ${totalRevenue}`, 120, 60);
+        doc.setFont("helvetica", "normal");
+
+        // Table
+        const tableColumn = ["ID", "Date", "Customer", "Items", "Status", "Amount"];
+        const tableRows: any[] = [];
+
+        currentMonthOrders.forEach(order => {
+            tableRows.push([
+                (order.id || order._id).substring(0, 8),
+                new Date(order.created_at || order.date).toLocaleDateString(),
+                order.user_name || order.customer?.name || order.user?.name || "Customer",
+                (order.orderItems?.length || order.items?.length || 0),
+                order.status,
+                `INR ${order.totalPrice || order.total || 0}`
+            ]);
+        });
+
+        autoTable(doc, {
+            startY: 80,
+            head: [tableColumn],
+            body: tableRows,
+            theme: 'grid',
+            headStyles: { fillColor: [44, 24, 16] }
+        });
+
+        doc.save(`Sales_Report_${monthName}_${year}.pdf`);
+    } catch (err: any) {
+        console.error("Sales Report Error:", err);
+        alert("Failed to generate sales report.");
+    }
+};
+

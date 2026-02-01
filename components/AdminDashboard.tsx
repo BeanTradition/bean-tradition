@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllOrders, getAllUsers, deliverOrder, fetchProducts, deleteProduct as apiDeleteProduct, createProduct, updateProduct, getCoupons, createCoupon, updateCouponStatus, deleteCoupon as apiDeleteCoupon } from '../services/api';
 import { Order, Product, Coupon, User } from '../types';
-import { generateInvoice, generateCustomerReport } from '../utils/pdfGenerator';
+import { generateInvoice, generateCustomerReport, generateMonthlySalesReport } from '../utils/pdfGenerator';
 
 interface AdminDashboardProps {
     onBack: () => void;
@@ -194,6 +194,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                             Exit to Shop
                         </button>
                     </div>
+                </div>
+
+                <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gold-100">
+                    <div>
+                        <h2 className="text-xs font-bold uppercase tracking-widest text-gold-600 mb-1">Business Intelligence</h2>
+                        <p className="text-sm text-gray-500">Generate financial summaries for active bookkeeping.</p>
+                    </div>
+                    <button
+                        onClick={() => generateMonthlySalesReport(orders)}
+                        className="bg-gold-500 text-white px-6 py-2 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-coffee-900 transition-all shadow-md transform hover:scale-105 active:scale-95 flex items-center gap-2"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Download Monthly Sales Report
+                    </button>
                 </div>
 
                 <div className="flex gap-4 mb-8">
