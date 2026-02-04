@@ -39,14 +39,14 @@ export const generateInvoice = (order: any, user: any | null) => {
         // Invoice Info (Right Align)
         doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
-        doc.text("TAX INVOICE", 140, 25);
+        doc.text("TAX INVOICE", 130, 25);
 
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         const invNo = order.order_number || order.id || order._id;
-        doc.text(`Invoice No: ${invNo}`, 140, 35);
-        doc.text(`Date: ${order.date || new Date(order.created_at).toLocaleDateString()}`, 140, 40);
-        doc.text(`Order ID: ${order.id || order._id}`, 140, 45);
+        doc.text(`Invoice No: ${invNo}`, 130, 35);
+        doc.text(`Date: ${order.date || new Date(order.created_at).toLocaleDateString()}`, 130, 40);
+        doc.text(`Order ID: ${order.id || order._id}`, 130, 45);
 
         doc.setDrawColor(200, 200, 200);
         doc.line(20, 55, 190, 55);
