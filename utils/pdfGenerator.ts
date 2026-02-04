@@ -5,97 +5,157 @@ import { Order, User, CartItem } from '../types';
 export const generateInvoice = (order: any, user: any | null) => {
     try {
         const doc = new jsPDF() as any;
-        const brandName = "Bean Tradition";
+        const brandName = "BEAN TRADITION";
         const brandSlogan = "Roast • Grind • Brew";
+        const gstNo = "36FAEPR9507L1Z1";
+        const fssaiNo = "23625029000985";
+        const contactEmail = "beantradition@gmail.com";
+        const contactMobile = "+91-7075852734";
 
-        // Header
+        // Header - Left Side (Brand Branding)
         doc.setFontSize(22);
         doc.setTextColor(44, 24, 16); // coffee-900
-        doc.text(brandName, 20, 30);
+        doc.setFont("helvetica", "bold");
+        doc.text(brandName, 20, 25);
 
-        doc.setFontSize(10);
-        doc.setTextColor(150, 150, 150);
-        doc.text(brandSlogan, 20, 36);
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.setFont("helvetica", "normal");
+        doc.text(brandSlogan, 20, 31);
 
+        doc.setTextColor(60, 60, 60);
+        doc.text(`GSTIN: ${gstNo}`, 20, 38);
+        doc.text(`FSSAI: ${fssaiNo}`, 20, 43);
+        doc.text(`Email: ${contactEmail}`, 20, 48);
+        doc.text(`Mobile: ${contactMobile}`, 20, 53);
+
+        // Header - Right Side (Invoice Label)
         doc.setFontSize(18);
         doc.setTextColor(44, 24, 16);
-        doc.text("INVOICE", 150, 30);
+        doc.setFont("helvetica", "bold");
+        doc.text("TAX INVOICE", 150, 25);
 
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.setTextColor(0, 0, 0);
-        doc.text(`Order Number: ${order.order_number || order.id || order._id}`, 150, 36);
-        doc.text(`Date: ${order.date || new Date(order.created_at).toLocaleDateString()}`, 150, 42);
-        doc.text(`Invoice No: ${order.order_number || order.id || order._id}`, 150, 48);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Invoice No: ${order.order_number || order.id || order._id}`, 140, 32);
+        doc.text(`Date: ${order.date || new Date(order.created_at).toLocaleDateString()}`, 140, 37);
+        doc.text(`Payment: ${order.paymentMethod || 'Online'}`, 140, 42);
 
         // Horizontal Line
-        doc.setDrawColor(210, 180, 140); // gold/coffee tint
-        doc.line(20, 50, 190, 50);
+        doc.setDrawColor(210, 180, 140);
+        doc.line(20, 58, 190, 58);
 
-        // Billing Details - Handle different property names (customer vs shippingAddress)
+        // Billing Details
         const customerInfo = order.customer || order.shippingAddress || {};
-        doc.setFontSize(12);
+        doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
-        doc.text("Bill To:", 20, 65);
+        doc.text("BILL TO:", 20, 68);
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        doc.text(customerInfo.name || order.user_name || user?.name || "Customer", 20, 72);
-        doc.text(customerInfo.phone || user?.phone || "", 20, 77);
-        doc.text(customerInfo.address || "", 20, 82);
-        doc.text(`${customerInfo.city || ""}, ${customerInfo.pincode || ""}`, 20, 87);
-        doc.text("India", 20, 92);
+        doc.text(customerInfo.name || order.user_name || user?.name || "Customer", 20, 74);
+        doc.text(`Phone: ${customerInfo.phone || user?.phone || "N/A"}`, 20, 79);
+        doc.text(customerInfo.address || "", 20, 84, { maxWidth: 80 });
+        doc.text(`${customerInfo.city || ""}${customerInfo.city ? ',' : ''} ${customerInfo.pincode || ""}`, 20, 94);
+        doc.text("India", 20, 99);
 
-        // Table
-        const tableColumn = ["Product", "Weight", "Roast/Intensity", "Qty", "Price", "Subtotal"];
+        // Table Content
+        const tableColumn = ["Sl", "Product Description", "HSN", "Qty", "Price", "IGST", "Subtotal"];
         const tableRows: any[] = [];
 
-        // Correctly handle items vs orderItems
+        let totalTaxableValue = 0;
+        let totalIGST = 0;
+
         const items = order.items || order.orderItems || [];
-        items.forEach((item: any) => {
+        items.forEach((item: any, index: number) => {
             const price = item.price || (item.selectedVariant ? item.selectedVariant.price : 0);
-            const weight = item.weight || (item.selectedVariant ? item.selectedVariant.weight : '-');
-            const profile = (item.roast || item.selectedRoast || item.intensity || item.selectedIntensity || '-');
+            const category = item.category || "";
+
+            // Determine HSN and Tax Rate
+            // Beans/Filter: 0901, 5%. Instant: 2101, 18%
+            let hsn = "0901";
+            let gstRate = 0.05;
+
+            if (category.toLowerCase().includes("instant")) {
+                hsn = "2101";
+                gstRate = 0.18;
+            }
+
+            // Calculation (Assuming price is inclusive of tax)
+            const taxableValue = (price * item.quantity) / (1 + gstRate);
+            const igstAmount = (price * item.quantity) - taxableValue;
+
+            totalTaxableValue += taxableValue;
+            totalIGST += igstAmount;
+
+            const profile = (item.roast || item.selectedRoast || item.intensity || item.selectedIntensity);
+            const desc = `${item.name}${profile ? ` (${profile})` : ''} - ${item.weight || item.selectedVariant?.weight || '-'}`;
 
             const itemData = [
-                item.name,
-                weight,
-                profile,
+                index + 1,
+                desc,
+                hsn,
                 item.quantity,
-                `INR ${price}`,
-                `INR ${price * item.quantity}`
+                `INR ${price.toFixed(2)}`,
+                `${(gstRate * 100)}%`,
+                `INR ${(price * item.quantity).toFixed(2)}`
             ];
             tableRows.push(itemData);
         });
 
         autoTable(doc, {
-            startY: 105,
+            startY: 110,
             head: [tableColumn],
             body: tableRows,
             theme: 'grid',
-            headStyles: { fillColor: [44, 24, 16], textColor: [255, 255, 255] },
-            alternateRowStyles: { fillColor: [245, 245, 245] },
+            headStyles: { fillColor: [44, 24, 16], textColor: [255, 255, 255], fontSize: 9 },
+            bodyStyles: { fontSize: 8 },
+            columnStyles: {
+                0: { cellWidth: 10 },
+                1: { cellWidth: 60 },
+                2: { cellWidth: 15 },
+                3: { cellWidth: 10 },
+                4: { cellWidth: 25 },
+                5: { cellWidth: 15 },
+                6: { cellWidth: 35 }
+            }
         });
 
         const finalY = (doc as any).lastAutoTable.finalY + 10;
 
-        // Totals
+        // Summary Section
         const totalPrice = order.total || order.totalPrice || 0;
-        doc.setFont("helvetica", "bold");
-        doc.text("Summary", 140, finalY);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Subtotal: INR ${totalPrice}`, 140, finalY + 7);
-        doc.text(`Shipping: INR 0`, 140, finalY + 14);
 
-        doc.setFontSize(14);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text("Taxable Value:", 130, finalY);
+        doc.text(`INR ${totalTaxableValue.toFixed(2)}`, 170, finalY, { align: 'right' });
+
+        doc.text("Total IGST:", 130, finalY + 6);
+        doc.text(`INR ${totalIGST.toFixed(2)}`, 170, finalY + 6, { align: 'right' });
+
+        doc.setDrawColor(200, 200, 200);
+        doc.line(130, finalY + 9, 180, finalY + 9);
+
+        doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(44, 24, 16);
-        doc.text(`Total: INR ${totalPrice}`, 140, finalY + 24);
+        doc.text("GRAND TOTAL:", 130, finalY + 16);
+        doc.text(`INR ${totalPrice.toFixed(2)}`, 170, finalY + 16, { align: 'right' });
+
+        // Amount in words placeholder if needed, otherwise footer
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(100, 100, 100);
+        doc.text("Total amount is inclusive of applicable GST.", 20, finalY + 30);
 
         // Footer
-        doc.setFontSize(10);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
         doc.setTextColor(150, 150, 150);
-        doc.text("Thank you for choosing Bean Tradition!", 105, 280, { align: "center" });
-        doc.text("www.beantradition.in", 105, 285, { align: "center" });
+        doc.text("Thank you for your business!", 105, 280, { align: "center" });
+        doc.text("This is a computer generated invoice.", 105, 285, { align: "center" });
 
         doc.save(`Invoice_${order.order_number || order.id || order._id}.pdf`);
     } catch (err: any) {
