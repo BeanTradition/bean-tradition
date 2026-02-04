@@ -5,220 +5,181 @@ import { Order, User, CartItem } from '../types';
 export const generateInvoice = (order: any, user: any | null) => {
     try {
         const doc = new jsPDF() as any;
-        const brandName = "Bean Tradition";
-        const brandSlogan = "Delivering Coffee & Happiness";
-        const gstNo = "36FAEPR9507L1Z1";
-        const fssaiNo = "23625029000985";
-        const companyAddress = [
-            "No. 123, Coffee Estate Row,",
-            "Near Hills View Park, Chikmagalur,",
-            "Karnataka - 577101",
-            "India"
-        ];
+        const brandName = "BEAN TRADITION";
+        const brandColor: [number, number, number] = [44, 24, 16]; // #2C1810
 
-        // Header - Left Side (Brand Branding)
-        doc.setFontSize(22);
-        doc.setTextColor(44, 24, 16); // coffee-900
+        // --- Header Section ---
+        // Logo (Placeholder for the actual logo image)
+        try {
+            doc.addImage("/assets/logo.png", "PNG", 20, 15, 30, 30);
+        } catch (e) {
+            // Fallback if logo fails
+            doc.setFontSize(20);
+            doc.setTextColor(brandColor[0], brandColor[1], brandColor[2]);
+            doc.text("BT", 25, 30);
+        }
+
+        // Company Details (Left Align)
+        doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text(brandName, 20, 30);
+        doc.setTextColor(brandColor[0], brandColor[1], brandColor[2]);
+        doc.text(brandName, 55, 25);
 
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100, 100, 100);
+        doc.text("Premium Coffee Roasters", 55, 30);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`GSTIN: 36FAEPR9507L1Z1`, 55, 35);
+        doc.text(`FSSAI Lic No: 23625029000985`, 55, 39);
+        doc.text(`Email: beantradition@gmail.com`, 55, 43);
+        doc.text(`Mobile: +91-7075852734`, 55, 47);
+
+        // Invoice Info (Right Align)
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.text("TAX INVOICE", 140, 25);
+
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        const invNo = order.order_number || order.id || order._id;
+        doc.text(`Invoice No: ${invNo}`, 140, 35);
+        doc.text(`Date: ${order.date || new Date(order.created_at).toLocaleDateString()}`, 140, 40);
+        doc.text(`Order ID: ${order.id || order._id}`, 140, 45);
+
+        doc.setDrawColor(200, 200, 200);
+        doc.line(20, 55, 190, 55);
+
+        // --- Billing Details ---
+        const customerInfo = order.customer || order.shippingAddress || {};
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(60, 60, 60);
-        doc.text(brandSlogan, 20, 36);
+        doc.text("BILL TO / SHIP TO:", 20, 65);
 
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        let addressY = 42;
-        companyAddress.forEach(line => {
-            doc.text(line, 20, addressY);
-            addressY += 4;
-        });
-        doc.text(`GSTIN: ${gstNo}`, 20, addressY);
-        doc.text(`FSSAI: ${fssaiNo}`, 20, addressY + 4);
-
-        // Right Side Header
-        doc.setFontSize(20);
-        doc.setTextColor(44, 24, 16);
-        doc.setFont("helvetica", "bold");
-        doc.text("PROFORMA", 140, 30, { align: 'right' });
-        doc.text("INVOICE", 140, 38, { align: 'right' });
+        doc.text(customerInfo.name || order.user_name || user?.name || "Customer", 20, 70);
         doc.setFontSize(9);
-        doc.text(`Sales Order# ${order.order_number || order.id || order._id}`, 140, 45, { align: 'right' });
+        doc.setTextColor(80, 80, 80);
+        doc.text(customerInfo.address || "", 20, 75, { maxWidth: 80 });
+        doc.text(`${customerInfo.city || ""}, ${customerInfo.pincode || ""}`, 20, 85);
+        doc.text(`Phone: ${customerInfo.phone || user?.phone || "N/A"}`, 20, 90);
 
-        // Horizontal Line
-        doc.setDrawColor(210, 180, 140);
-        doc.line(20, 58, 190, 58);
-
-        // Addresses Section
-        const customerInfo = order.customer || order.shippingAddress || {};
-
-        // Billing
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
-        doc.text("Billing Address", 20, 75);
-        doc.setFont("helvetica", "normal");
-        doc.text(customerInfo.name || "Customer", 20, 80);
-        doc.text(customerInfo.address || "", 20, 84, { maxWidth: 60 });
-        doc.text(`${customerInfo.city || ""}, ${customerInfo.pincode || ""}`, 20, 94);
-        doc.text("India", 20, 98);
-        doc.text(customerInfo.phone || "", 20, 102);
-
-        // Shipping
-        doc.setFont("helvetica", "bold");
-        doc.text("Shipping / Delivery Address", 20, 115);
-        doc.setFont("helvetica", "normal");
-        doc.text(customerInfo.name || "Customer", 20, 120);
-        doc.text(customerInfo.address || "", 20, 124, { maxWidth: 60 });
-        doc.text(`${customerInfo.city || ""}, ${customerInfo.pincode || ""}`, 20, 134);
-        doc.text("India", 20, 138);
-        doc.text(customerInfo.phone || "", 20, 142);
-
-        // Order Info Right
-        doc.setFont("helvetica", "normal");
-        doc.text("Order Date : ", 140, 125, { align: 'right' });
-        doc.text(order.date || new Date(order.created_at).toLocaleDateString('en-IN'), 180, 125, { align: 'right' });
-        doc.text("Ref# : ", 140, 132, { align: 'right' });
-        doc.text(`${(order.id || order._id).substring(0, 8)}/Digital`, 180, 132, { align: 'right' });
-
-        doc.setFont("helvetica", "bold");
-        doc.text("Place Of Supply: ", 20, 155);
-        doc.setFont("helvetica", "normal");
-        doc.text(`${customerInfo.city || "Karnataka"} (29)`, 50, 155);
-
-        // Table
-        const tableColumn = ["#", "Item & Description", "HSN/SAC", "Qty", "Rate", "Amount"];
+        // --- Table Section ---
+        const tableColumn = [
+            "Sl.",
+            "Product Description",
+            "HSN",
+            "Qty",
+            "Price",
+            "Taxable",
+            "IGST %",
+            "Total"
+        ];
         const tableRows: any[] = [];
 
-        let subTotal = 0;
-        let totalCGST = 0;
-        let totalSGST = 0;
-
         const items = order.items || order.orderItems || [];
+        let totalTaxableValue = 0;
+        let totalIgstAmount = 0;
+
         items.forEach((item: any, index: number) => {
             const price = item.price || (item.selectedVariant ? item.selectedVariant.price : 0);
-            const category = item.category || "";
+            const qty = item.quantity;
+            const totalItemAmount = price * qty;
 
-            let hsn = "09012190";
-            let gstRate = 0.05;
-            if (category.toLowerCase().includes("instant")) {
+            // HSN and Tax Mapping
+            const itemName = (item.name || "").toLowerCase();
+            let hsn = "0901"; // Default for Coffee Beans/Filter
+            let taxRate = 5;
+
+            if (itemName.includes("instant")) {
                 hsn = "2101";
-                gstRate = 0.18;
+                taxRate = 18;
             }
 
-            const taxableRate = price / (1 + gstRate);
-            const amount = taxableRate * item.quantity;
+            // Backward calculate Taxable Value: Price is inclusive of tax
+            // Taxable = Total / (1 + (Rate/100))
+            const taxableValue = totalItemAmount / (1 + (taxRate / 100));
+            const igstAmount = totalItemAmount - taxableValue;
 
-            subTotal += amount;
-            totalCGST += (amount * (gstRate / 2));
-            totalSGST += (amount * (gstRate / 2));
+            totalTaxableValue += taxableValue;
+            totalIgstAmount += igstAmount;
 
-            const profile = (item.roast || item.selectedRoast || item.intensity || item.selectedIntensity);
-            const desc = `${item.name}\n${profile ? `${profile} Roast` : ''}`;
+            const profile = (item.roast || item.selectedRoast || item.intensity || item.selectedIntensity || '');
+            const desc = `${item.name} ${item.weight || (item.selectedVariant?.weight || '')} ${profile}`.trim();
 
             tableRows.push([
                 index + 1,
                 desc,
                 hsn,
-                `${item.quantity} KGS`,
-                taxableRate.toFixed(2),
-                amount.toFixed(2)
+                qty,
+                price.toFixed(2),
+                taxableValue.toFixed(2),
+                `${taxRate}%`,
+                totalItemAmount.toFixed(2)
             ]);
         });
 
-        // Add shipping if any
-        const shipping = order.shippingPrice || 0;
-        if (shipping > 0) {
-            const shipTaxRate = 0.05; // Standard 5% for shipping/transport
-            const shipTaxable = shipping / (1 + shipTaxRate);
-            subTotal += shipTaxable;
-            totalCGST += (shipTaxable * (shipTaxRate / 2));
-            totalSGST += (shipTaxable * (shipTaxRate / 2));
-
-            tableRows.push([
-                items.length + 1,
-                "Weight Handling and Shipping Fee",
-                "996811",
-                "1.00 NOS",
-                shipTaxable.toFixed(2),
-                shipTaxable.toFixed(2)
-            ]);
-        }
-
         autoTable(doc, {
-            startY: 165,
+            startY: 100,
             head: [tableColumn],
             body: tableRows,
             theme: 'grid',
-            headStyles: { fillColor: [60, 60, 60], textColor: [255, 255, 255], fontSize: 8 },
+            headStyles: { fillColor: brandColor, textColor: [255, 255, 255], fontSize: 8 },
             bodyStyles: { fontSize: 8 },
             columnStyles: {
                 0: { cellWidth: 10 },
-                1: { cellWidth: 70 }, // Reduced slightly to fit 170mm total
-                2: { cellWidth: 20 },
-                3: { cellWidth: 20 },
-                4: { cellWidth: 25 },
-                5: { cellWidth: 25 }
-            },
-            margin: { left: 20, right: 20 }
+                1: { cellWidth: 70 },
+                2: { cellWidth: 15 },
+                3: { cellWidth: 10 },
+                4: { cellWidth: 20 },
+                5: { cellWidth: 20 },
+                6: { cellWidth: 15 },
+                7: { cellWidth: 30 },
+            }
         });
 
         const finalY = (doc as any).lastAutoTable.finalY + 10;
 
-        // Summary Section
-        const labelX = 110; // Move labels further left to prevent any overlap
-        const valueX = 190; // Strictly right-aligned to margin
+        // --- Summary Section ---
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("SUMMARY", 130, finalY);
+
+        doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
-        doc.setFont("helvetica", "normal");
+        doc.text(`Total Taxable Value:`, 130, finalY + 7);
+        doc.text(`INR ${totalTaxableValue.toFixed(2)}`, 185, finalY + 7, { align: "right" });
 
-        doc.text("Sub Total:", labelX, finalY);
-        doc.text(subTotal.toFixed(2), valueX, finalY, { align: 'right' });
+        doc.text(`Total IGST Amount:`, 130, finalY + 12);
+        doc.text(`INR ${totalIgstAmount.toFixed(2)}`, 185, finalY + 12, { align: "right" });
 
-        doc.text(`CGST ( ${(totalCGST > 0 ? (totalCGST / subTotal * 100).toFixed(1) : '2.5')}% ):`, labelX, finalY + 6);
-        doc.text(totalCGST.toFixed(2), valueX, finalY + 6, { align: 'right' });
+        doc.setDrawColor(200, 200, 200);
+        doc.line(130, finalY + 16, 190, finalY + 16);
 
-        doc.text(`SGST ( ${(totalSGST > 0 ? (totalSGST / subTotal * 100).toFixed(1) : '2.5')}% ):`, labelX, finalY + 12);
-        doc.text(totalSGST.toFixed(2), valueX, finalY + 12, { align: 'right' });
-
-        const total = subTotal + totalCGST + totalSGST;
-        const rounding = Math.round(total) - total;
-        doc.text("Rounding Amount:", labelX, finalY + 18);
-        doc.text(rounding.toFixed(2), valueX, finalY + 18, { align: 'right' });
-
-        // Highlight box for Total
-        doc.setFillColor(245, 245, 245);
-        doc.rect(labelX - 2, finalY + 22, 84, 10, 'F'); // Wider highlight box
         doc.setFont("helvetica", "bold");
-        doc.text("Total Payable Amount:", labelX, finalY + 28);
-        doc.text(`INR ${Math.round(total).toFixed(2)}`, valueX, finalY + 28, { align: 'right' });
+        doc.setFontSize(11);
+        doc.text(`Grand Total:`, 130, finalY + 22);
+        const grandTotal = (order.total || order.totalPrice || 0);
+        doc.text(`INR ${Number(grandTotal).toFixed(2)}`, 185, finalY + 22, { align: "right" });
 
-        // Terms & Conditions
-        doc.setFont("helvetica", "bold");
+        // --- Notes & Footer ---
         doc.setFontSize(8);
-        doc.text("Terms & Conditions", 20, finalY + 45);
         doc.setFont("helvetica", "normal");
-        const terms = [
-            "MSME Registration Notice:",
-            "This company is registered under the Micro, Small, and Medium enterprises (MSME) Act, 2006. Our MSME registration number is UDYAM-BT-26-0001.",
-            "As per the MSME Act, 2006, payments for invoices are to be made within 45 days of receipt. Failure to comply will entitle us to claim interest on the overdue amount at the rate prescribed under the MSME Act.",
-            "Product will be dispatched within 4 Days from date of Order. 100% Advance Payment along with Confirmed Purchase Order.",
-            "",
-            "Bank Details : IMPS/NEFT/RTGS",
-            "Bean Tradition Coffee Pvt Ltd",
-            "A/C: 073905013701",
-            "BANK : ICICI BANK",
-            "IFSC : ICIC0000739"
-        ];
-        let termsY = finalY + 50;
-        terms.forEach(line => {
-            doc.text(line, 20, termsY, { maxWidth: 100 });
-            termsY += 4;
-        });
+        doc.setTextColor(100, 100, 100);
+        doc.text("Notes:", 20, finalY + 7);
+        doc.text("1. All prices are inclusive of GST.", 20, finalY + 12);
+        doc.text("2. This is a computer generated invoice.", 20, finalY + 17);
 
-        // Signature
+        // Signature Area
+        doc.setTextColor(0, 0, 0);
         doc.setFont("helvetica", "bold");
-        doc.text("Authorized Signature", 140, finalY + 85);
-        doc.line(130, finalY + 82, 180, finalY + 82);
+        doc.text("For BEAN TRADITION", 140, finalY + 45);
+        doc.text("Authorized Signatory", 140, finalY + 55);
+
+        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text("www.beantradition.in | beantradition@gmail.com | +91-7075852734", 105, 285, { align: "center" });
 
         doc.save(`Invoice_${order.order_number || order.id || order._id}.pdf`);
     } catch (err: any) {
