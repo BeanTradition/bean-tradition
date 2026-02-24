@@ -26,7 +26,7 @@ export const PRODUCTS: Product[] = [
     id: '1',
     name: "Robusta Coffee Beans",
     description: "Indulge in the bold and robust flavor of our Robusta blends, perfect for those who prefer a stronger coffee experience.",
-    image: "/assets/robusta.jpg",
+    image: "/assets/Robusta.jpg",
     tags: ["Bold", "Robust", "Strong Experience"],
     intensity: 5,
     roast: "Medium",
@@ -35,18 +35,13 @@ export const PRODUCTS: Product[] = [
     bestFor: "Strong Espresso & Cold Brew",
     variants: [
       { weight: "250gm", price: 499 },
-      /* 
-         Future Variants:
-         { weight: "500gm", price: 749 },
-         { weight: "1kg", price: 1399 }
-      */
     ]
   },
   {
     id: '2',
     name: "Arabica Coffee Beans",
     description: "Experience the delicate floral notes and subtle sweetness of our premium Arabica beans.",
-    image: "/assets/arabica.jpg",
+    image: "/assets/Arabica.jpg",
     tags: ["Delicate", "Floral", "Subtle Sweetness"],
     intensity: 3,
     roast: "Medium",
@@ -55,18 +50,13 @@ export const PRODUCTS: Product[] = [
     bestFor: "Pour Over, French Press & Black Coffee",
     variants: [
       { weight: "250gm", price: 599 },
-      /* 
-         Future Variants:
-         { weight: "500gm", price: 949 },
-         { weight: "1kg", price: 1799 }
-      */
     ]
   },
   {
     id: '3',
     name: "Filter Coffee Powder",
     description: "Our freshly ground filter coffee powder is perfect for brewing the classic South Indian filter coffee, known for its rich aroma and robust flavor.",
-    image: "/assets/filter_coffee.jpg",
+    image: "/assets/Filter.jpg",
     tags: ["Rich Aroma", "Classic", "Robust Flavor"],
     intensity: 4,
     roast: "Medium",
@@ -75,18 +65,13 @@ export const PRODUCTS: Product[] = [
     bestFor: "Traditional South Indian Filter",
     variants: [
       { weight: "250gm", price: 399 },
-      /* 
-         Future Variants:
-         { weight: "500gm", price: 549 },
-         { weight: "1kg", price: 999 }
-      */
     ]
   },
   {
     id: '4',
     name: "Instant Coffee Powder",
     description: "Enjoy a quick and convenient cup of premium instant coffee, made with high-quality beans and expertly blended for a satisfying taste.",
-    image: "/assets/instant_coffee.jpg",
+    image: "/assets/Instant.jpg",
     tags: ["Quick", "Convenient", "Expertly Blended"],
     intensity: 3,
     roast: "Medium",
@@ -95,11 +80,6 @@ export const PRODUCTS: Product[] = [
     bestFor: "Traveling & Quick Hot/Cold Coffee",
     variants: [
       { weight: "200gm", price: 499 },
-      /* 
-         Future Variants:
-         { weight: "50gm", price: 120 },
-         { weight: "100gm", price: 220 }
-      */
     ]
   }
 ];

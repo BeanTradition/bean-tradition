@@ -479,7 +479,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
 
                         {products.map(product => (
                             <div key={product.id || product._id} className="bg-white rounded-xl shadow overflow-hidden flex flex-col border border-gray-100">
-                                <img src={product.image} alt={product.name} className="h-40 w-full object-cover" />
+                                <img
+                                    src={`/assets/${product.name.split(' ')[0]}.jpg`}
+                                    alt={product.name}
+                                    onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        if (target.src !== product.image) {
+                                            target.src = product.image;
+                                        }
+                                    }}
+                                    className="h-40 w-full object-cover"
+                                />
                                 <div className="p-4 flex-grow">
                                     <div className="flex justify-between items-start mb-2">
                                         <h3 className="font-bold text-coffee-900 leading-tight">{product.name}</h3>

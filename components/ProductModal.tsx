@@ -75,8 +75,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
 
         <div className="w-full md:w-1/2 h-64 md:h-auto bg-gray-100 relative flex-shrink-0">
           <img
-            src={product.image}
+            src={`/assets/${product.name.split(' ')[0]}.jpg`}
             alt={product.name}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (target.src !== product.image) {
+                target.src = product.image;
+              }
+            }}
             className="w-full h-full object-cover"
           />
           <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 bg-gradient-to-t from-black/60 to-transparent">

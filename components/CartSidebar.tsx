@@ -74,7 +74,17 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   <div className="w-20 h-20 bg-gray-100 rounded-sm overflow-hidden flex-shrink-0 relative group">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <img
+                      src={`/assets/${item.name.split(' ')[0]}.jpg`}
+                      alt={item.name}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target.src !== item.image) {
+                          target.src = item.image;
+                        }
+                      }}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
                   </div>
                   <div className="flex-grow">
                     <h3 className="font-serif font-bold text-coffee-900">{item.name}</h3>
