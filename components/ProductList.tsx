@@ -110,14 +110,12 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
             >
               <div className="relative h-44 md:h-80 overflow-hidden bg-gray-100">
                 <img
-                  src={product.image}
+                  src={
+                    product.name.toLowerCase().includes('arabica') ? '/assets/aa_grade.jpg' :
+                      product.name.toLowerCase().includes('robusta') ? '/assets/zero_defects.jpg' :
+                        (product.image && product.image.startsWith('http') ? `/assets/${product.name.split(' ')[0]}.jpg` : product.image)
+                  }
                   alt={product.name}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== product.image) {
-                      target.src = product.image;
-                    }
-                  }}
                   className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 ease-in-out"
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500"></div>

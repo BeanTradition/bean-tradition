@@ -75,14 +75,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
 
         <div className="w-full md:w-1/2 h-64 md:h-auto bg-gray-100 relative flex-shrink-0">
           <img
-            src={product.image}
+            src={
+              product.name.toLowerCase().includes('arabica') ? '/assets/aa_grade.jpg' :
+                product.name.toLowerCase().includes('robusta') ? '/assets/zero_defects.jpg' :
+                  (product.image && product.image.startsWith('http') ? `/assets/${product.name.split(' ')[0]}.jpg` : product.image)
+            }
             alt={product.name}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              if (target.src !== product.image) {
-                target.src = product.image;
-              }
-            }}
             className="w-full h-full object-contain"
           />
           <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 bg-gradient-to-t from-black/60 to-transparent">
