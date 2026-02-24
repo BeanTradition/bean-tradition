@@ -76,9 +76,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
         <div className="w-full md:w-1/2 h-64 md:h-auto bg-gray-100 relative flex-shrink-0">
           <img
             src={
-              product.name.toLowerCase().includes('arabica') ? '/assets/aa_grade.jpg' :
-                product.name.toLowerCase().includes('robusta') ? '/assets/zero_defects.jpg' :
-                  (product.image && product.image.startsWith('http') ? `/assets/${product.name.split(' ')[0]}.jpg` : product.image)
+              product.name.toLowerCase().includes('arabica') ? '/assets/Arabica.jpg' :
+                product.name.toLowerCase().includes('robusta') ? '/assets/Robusta.jpg' :
+                  product.name.toLowerCase().includes('filter') ? '/assets/Filter.jpg' :
+                    product.name.toLowerCase().includes('instant') ? '/assets/Instant.jpg' :
+                      product.image
             }
             alt={product.name}
             className="w-full h-full object-contain"

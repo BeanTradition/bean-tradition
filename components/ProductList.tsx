@@ -111,9 +111,11 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
               <div className="relative h-44 md:h-80 overflow-hidden bg-gray-100">
                 <img
                   src={
-                    product.name.toLowerCase().includes('arabica') ? '/assets/aa_grade.jpg' :
-                      product.name.toLowerCase().includes('robusta') ? '/assets/zero_defects.jpg' :
-                        (product.image && product.image.startsWith('http') ? `/assets/${product.name.split(' ')[0]}.jpg` : product.image)
+                    product.name.toLowerCase().includes('arabica') ? '/assets/Arabica.jpg' :
+                      product.name.toLowerCase().includes('robusta') ? '/assets/Robusta.jpg' :
+                        product.name.toLowerCase().includes('filter') ? '/assets/Filter.jpg' :
+                          product.name.toLowerCase().includes('instant') ? '/assets/Instant.jpg' :
+                            product.image
                   }
                   alt={product.name}
                   className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 ease-in-out"
