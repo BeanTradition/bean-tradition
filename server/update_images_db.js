@@ -4,10 +4,10 @@ async function updateProductImages() {
     console.log('Updating product image paths in Supabase...');
 
     const updates = [
-        { name: 'Arabica Coffee Beans', image: '/assets/Arabica.jpg' },
-        { name: 'Robusta Coffee Beans', image: '/assets/Robusta.jpg' },
-        { name: 'Filter Coffee Powder', image: '/assets/Filter.jpg' },
-        { name: 'Instant Coffee Powder', image: '/assets/Instant.jpg' }
+        { name: 'Arabica Coffee Beans', image: '/assets/Arabica Coffee Beans.jpg' },
+        { name: 'Robusta Coffee Beans', image: '/assets/Robusta Coffee Beans.jpg' },
+        { name: 'Filter Coffee Powder', image: '/assets/Filter Coffee Powder.jpg' },
+        { name: 'Instant Coffee Powder', image: '/assets/Instant Coffee Powder.jpg' }
     ];
 
     for (const update of updates) {

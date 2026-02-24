@@ -3,7 +3,7 @@ VALUES
 (
   'Robusta Coffee Beans', 
   'Indulge in the bold and robust flavor of our Robusta blends, perfect for those who prefer a stronger coffee experience.', 
-  '/assets/robusta.jpg',
+  '/assets/Robusta Coffee Beans.jpg',
   'Beans',
   'Medium',
   5,
@@ -17,7 +17,7 @@ VALUES
 (
   'Arabica Coffee Beans', 
   'Experience the delicate floral notes and subtle sweetness of our premium Arabica beans.',
-  '/assets/arabica.jpg',
+  '/assets/Arabica Coffee Beans.jpg',
   'Beans',
   'Medium',
   3,
@@ -31,7 +31,7 @@ VALUES
 (
   'Filter Coffee Powder', 
   'Our freshly ground filter coffee powder is perfect for brewing the classic South Indian filter coffee, known for its rich aroma and robust flavor.',
-  '/assets/filter_coffee.jpg',
+  '/assets/Filter Coffee Powder.jpg',
   'Filter Powder',
   'Medium',
   4,
@@ -45,7 +45,7 @@ VALUES
 (
   'Instant Coffee Powder', 
   'Enjoy a quick and convenient cup of premium instant coffee, made with high-quality beans and expertly blended for a satisfying taste.',
-  '/assets/instant_coffee.jpg',
+  '/assets/Instant Coffee Powder.jpg',
   'Instant',
   'Medium',
   3,

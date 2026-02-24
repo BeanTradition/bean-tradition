@@ -480,7 +480,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                         {products.map(product => (
                             <div key={product.id || product._id} className="bg-white rounded-xl shadow overflow-hidden flex flex-col border border-gray-100">
                                 <img
-                                    src={`/assets/${product.name.split(' ')[0]}.jpg`}
+                                    src={
+                                        product.name.toLowerCase().includes('arabica') ? '/assets/Arabica Coffee Beans.jpg' :
+                                            product.name.toLowerCase().includes('robusta') ? '/assets/Robusta Coffee Beans.jpg' :
+                                                product.name.toLowerCase().includes('filter') ? '/assets/Filter Coffee Powder.jpg' :
+                                                    product.name.toLowerCase().includes('instant') ? '/assets/Instant Coffee Powder.jpg' :
+                                                        product.image
+                                    }
                                     alt={product.name}
                                     onError={(e) => {
                                         const target = e.target as HTMLImageElement;
@@ -488,7 +494,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
                                             target.src = product.image;
                                         }
                                     }}
-                                    className="h-40 w-full object-cover"
+                                    className="h-40 w-full object-contain"
                                 />
                                 <div className="p-4 flex-grow">
                                     <div className="flex justify-between items-start mb-2">

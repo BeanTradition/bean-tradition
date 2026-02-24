@@ -75,7 +75,13 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                 >
                   <div className="w-20 h-20 bg-gray-100 rounded-sm overflow-hidden flex-shrink-0 relative group">
                     <img
-                      src={`/assets/${item.name.split(' ')[0]}.jpg`}
+                      src={
+                        item.name.toLowerCase().includes('arabica') ? '/assets/Arabica Coffee Beans.jpg' :
+                          item.name.toLowerCase().includes('robusta') ? '/assets/Robusta Coffee Beans.jpg' :
+                            item.name.toLowerCase().includes('filter') ? '/assets/Filter Coffee Powder.jpg' :
+                              item.name.toLowerCase().includes('instant') ? '/assets/Instant Coffee Powder.jpg' :
+                                item.image
+                      }
                       alt={item.name}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -83,7 +89,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                           target.src = item.image;
                         }
                       }}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
                     />
                   </div>
                   <div className="flex-grow">

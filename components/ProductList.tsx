@@ -111,10 +111,10 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
               <div className="relative h-44 md:h-80 overflow-hidden bg-gray-100">
                 <img
                   src={
-                    product.name.toLowerCase().includes('arabica') ? '/assets/Arabica.jpg' :
-                      product.name.toLowerCase().includes('robusta') ? '/assets/Robusta.jpg' :
-                        product.name.toLowerCase().includes('filter') ? '/assets/Filter.jpg' :
-                          product.name.toLowerCase().includes('instant') ? '/assets/Instant.jpg' :
+                    product.name.toLowerCase().includes('arabica') ? '/assets/Arabica Coffee Beans.jpg' :
+                      product.name.toLowerCase().includes('robusta') ? '/assets/Robusta Coffee Beans.jpg' :
+                        product.name.toLowerCase().includes('filter') ? '/assets/Filter Coffee Powder.jpg' :
+                          product.name.toLowerCase().includes('instant') ? '/assets/Instant Coffee Powder.jpg' :
                             product.image
                   }
                   alt={product.name}

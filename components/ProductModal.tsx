@@ -76,10 +76,10 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
         <div className="w-full md:w-1/2 h-64 md:h-auto bg-gray-100 relative flex-shrink-0">
           <img
             src={
-              product.name.toLowerCase().includes('arabica') ? '/assets/Arabica.jpg' :
-                product.name.toLowerCase().includes('robusta') ? '/assets/Robusta.jpg' :
-                  product.name.toLowerCase().includes('filter') ? '/assets/Filter.jpg' :
-                    product.name.toLowerCase().includes('instant') ? '/assets/Instant.jpg' :
+              product.name.toLowerCase().includes('arabica') ? '/assets/Arabica Coffee Beans.jpg' :
+                product.name.toLowerCase().includes('robusta') ? '/assets/Robusta Coffee Beans.jpg' :
+                  product.name.toLowerCase().includes('filter') ? '/assets/Filter Coffee Powder.jpg' :
+                    product.name.toLowerCase().includes('instant') ? '/assets/Instant Coffee Powder.jpg' :
                       product.image
             }
             alt={product.name}
