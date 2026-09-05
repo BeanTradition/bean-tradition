@@ -23,6 +23,40 @@ export const USP_DATA = [
 
 export const PRODUCTS: Product[] = [
   {
+    id: '3',
+    name: "Filter Coffee Powder",
+    description: "Our freshly ground filter coffee powder is perfect for brewing the classic South Indian filter coffee, known for its rich aroma and robust flavor. Most preferred blend: 70:30 ratio (Coffee : Chicory)",
+    image: "/assets/Filter Coffee Powder.jpg",
+    tags: ["Rich Aroma", "Classic", "Robust Flavor"],
+    intensity: 4,
+    roast: "Medium",
+    category: "Filter Powder",
+    tastingNotes: "Bold Cocoa & Chicory",
+    bestFor: "Traditional South Indian Filter",
+    variants: [
+      { weight: "250gm", price: 399 },
+      { weight: "500gm", price: 599 },
+      { weight: "1kg", price: 799 },
+    ]
+  },
+  {
+    id: '4',
+    name: "Instant Coffee Powder",
+    description: "Enjoy a quick and convenient cup of premium instant coffee, made with high-quality beans and expertly blended for a satisfying taste.",
+    image: "/assets/Instant Coffee Powder.jpg",
+    tags: ["Quick", "Convenient", "Expertly Blended"],
+    intensity: 3,
+    roast: "Medium",
+    category: "Instant",
+    tastingNotes: "Nutty & Smooth",
+    bestFor: "Traveling & Quick Hot/Cold Coffee",
+    variants: [
+      { weight: "200gm", price: 499 },
+      { weight: "500gm", price: 899 },
+      { weight: "1kg", price: 1299 },
+    ]
+  },
+  {
     id: '1',
     name: "Robusta Coffee Beans",
     description: "Indulge in the bold and robust flavor of our Robusta blends, perfect for those who prefer a stronger coffee experience.",
@@ -50,36 +84,6 @@ export const PRODUCTS: Product[] = [
     bestFor: "Pour Over, French Press & Black Coffee",
     variants: [
       { weight: "250gm", price: 599 },
-    ]
-  },
-  {
-    id: '3',
-    name: "Filter Coffee Powder",
-    description: "Our freshly ground filter coffee powder is perfect for brewing the classic South Indian filter coffee, known for its rich aroma and robust flavor.",
-    image: "/assets/Filter Coffee Powder.jpg",
-    tags: ["Rich Aroma", "Classic", "Robust Flavor"],
-    intensity: 4,
-    roast: "Medium",
-    category: "Filter Powder",
-    tastingNotes: "Bold Cocoa & Chicory",
-    bestFor: "Traditional South Indian Filter",
-    variants: [
-      { weight: "250gm", price: 399 },
-    ]
-  },
-  {
-    id: '4',
-    name: "Instant Coffee Powder",
-    description: "Enjoy a quick and convenient cup of premium instant coffee, made with high-quality beans and expertly blended for a satisfying taste.",
-    image: "/assets/Instant Coffee Powder.jpg",
-    tags: ["Quick", "Convenient", "Expertly Blended"],
-    intensity: 3,
-    roast: "Medium",
-    category: "Instant",
-    tastingNotes: "Nutty & Smooth",
-    bestFor: "Traveling & Quick Hot/Cold Coffee",
-    variants: [
-      { weight: "200gm", price: 499 },
     ]
   }
 ];

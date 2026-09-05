@@ -23,9 +23,14 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
   const [loading, setLoading] = useState(true);
   const [intensities, setIntensities] = useState<Record<string, 'Light' | 'Medium' | 'Strong'>>({});
   const [roasts, setRoasts] = useState<Record<string, 'Light' | 'Medium' | 'Dark'>>({});
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
 
   const getIntensity = (productId: string) => intensities[productId] || 'Medium';
   const getRoast = (productId: string, defaultRoast: string) => roasts[productId] || (defaultRoast as any) || 'Medium';
+  const getVariant = (product: Product) => {
+    const vWeight = selectedVariants[product.id];
+    return product.variants.find(v => v.weight === vWeight) || product.variants[0];
+  };
 
   // Fetch products from backend
   React.useEffect(() => {
@@ -41,7 +46,8 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
   }, []);
 
   // Filter Logic
-  const sourceProducts = products.length > 0 ? products : []; // Fallback to empty if fetch fails
+  const validProducts = Array.isArray(products) ? products : [];
+  const sourceProducts = validProducts.length > 0 ? validProducts : PRODUCTS; // Fallback to local constants if fetch fails
 
   const displayProducts = mode === 'home'
     ? sourceProducts.slice(0, 3)
@@ -147,7 +153,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 {/* Floating Action Button / Quantity Control */}
                 {mode === 'shop' && cart && onUpdateQuantity ? (
                   (() => {
-                    const defaultVariant = product.variants[0];
+                    const defaultVariant = getVariant(product);
                     const currentIntensity = getIntensity(product.id);
                     const currentRoast = getRoast(product.id, product.roast);
                     const profileKey = product.category === 'Beans' ? currentRoast : currentIntensity;
@@ -194,7 +200,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                         onClick={(e) => {
                           e.stopPropagation();
                           if (onQuickAdd) {
-                            const v = product.variants[0];
+                            const v = getVariant(product);
                             const intensity = (product.category === 'Filter Powder' || product.category === 'Instant') ? currentIntensity : undefined;
                             const roast = (product.category === 'Beans') ? currentRoast : undefined;
                             onQuickAdd({ ...product, selectedIntensity: intensity, selectedRoast: roast } as any, v);
@@ -282,12 +288,33 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                   </div>
                 )}
 
-                <div className="flex items-center justify-between mt-auto pt-3 md:pt-6 border-t border-gray-100 group-hover:border-gold-100 transition-colors">
-                  <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{product.variants[0].price}</span>
+                {/* Variant Selection for Card */}
+                {mode === 'shop' && product.variants.length > 1 && (
+                  <div className="mb-4" onClick={e => e.stopPropagation()}>
+                    <div className="flex gap-2 overflow-x-auto hide-scrollbar">
+                      {product.variants.map((v, i) => {
+                        const isSelected = getVariant(product).weight === v.weight;
+                        return (
+                          <button
+                            key={i}
+                            onClick={(e) => { e.stopPropagation(); setSelectedVariants(prev => ({ ...prev, [product.id]: v.weight })); }}
+                            className={`flex-1 flex flex-col items-center justify-center px-2 py-1 rounded-sm border transition-colors ${isSelected ? 'bg-coffee-900 text-white border-coffee-900' : 'bg-white text-coffee-600 border-gray-200 hover:border-gold-300'}`}
+                          >
+                            <span className="text-[10px] md:text-xs font-bold uppercase">{v.weight}</span>
+                            <span className={`text-[10px] md:text-xs ${isSelected ? 'text-gold-400' : 'text-coffee-900 font-bold'}`}>₹{v.price}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between mt-auto pt-3 md:pt-4 border-t border-gray-100 group-hover:border-gold-100 transition-colors" onClick={e => e.stopPropagation()}>
+                  <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{getVariant(product).price}</span>
 
                   {mode === 'shop' && cart && onUpdateQuantity && onQuickAdd && (
                     (() => {
-                      const defaultVariant = product.variants[0];
+                      const defaultVariant = getVariant(product);
                       const currentIntensity = getIntensity(product.id);
                       const currentRoast = getRoast(product.id, product.roast);
                       const profileKey = product.category === 'Beans' ? currentRoast : currentIntensity;
@@ -331,7 +358,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                           onClick={(e) => {
                             e.stopPropagation();
                             if (onQuickAdd) {
-                              const v = product.variants[0];
+                              const v = getVariant(product);
                               const intensity = (product.category === 'Filter Powder' || product.category === 'Instant') ? currentIntensity : undefined;
                               const roast = (product.category === 'Beans') ? currentRoast : undefined;
                               onQuickAdd({ ...product, selectedIntensity: intensity, selectedRoast: roast } as any, v);

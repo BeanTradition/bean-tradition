@@ -51,18 +51,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onLogout
         setLoading(true);
         try {
             const [ordersData, productsData, couponsData, usersData] = await Promise.all([
-                getAllOrders(),
-                fetchProducts(),
-                getCoupons(),
-                getAllUsers()
+                getAllOrders().catch(() => []),
+                fetchProducts().catch(() => []),
+                getCoupons().catch(() => []),
+                getAllUsers().catch(() => [])
             ]);
-            setOrders(ordersData);
-            setProducts(productsData);
-            setCoupons(couponsData);
-            setUsers(usersData);
+            setOrders(Array.isArray(ordersData) ? ordersData : []);
+            setProducts(Array.isArray(productsData) ? productsData : []);
+            setCoupons(Array.isArray(couponsData) ? couponsData : []);
+            setUsers(Array.isArray(usersData) ? usersData : []);
         } catch (error) {
-            console.error(error);
-            alert("Failed to load admin data");
+            console.error("Failed to load admin data", error);
+            setOrders([]);
+            setProducts([]);
+            setCoupons([]);
+            setUsers([]);
         }
         setLoading(false);
     };
