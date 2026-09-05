@@ -171,18 +171,13 @@ function App() {
         <h2 className="text-2xl font-serif font-bold mb-4 text-gold-400">Bean Tradition</h2>
         <p className="mb-6 opacity-70">Premium Coffee Beans • Sourced from the farms</p>
         
-        <div className="mb-8 p-4 bg-black/20 rounded-lg inline-block border border-white/5">
-          <p className="text-sm uppercase tracking-widest text-gold-400 mb-2">To place an order:</p>
-          <p className="text-sm mb-1 opacity-80">Please text or call:</p>
-          <p className="font-bold text-lg text-white">Rahul V</p>
-          <a href="tel:+919985802734" className="text-xl font-bold text-gold-300 hover:text-white transition-colors">+91 99858 02734</a>
-        </div>
-
-        <div className="flex justify-center gap-6 text-sm uppercase tracking-widest opacity-60 items-center">
+        <div className="flex justify-center gap-6 text-sm uppercase tracking-widest opacity-60 items-center mb-4 mt-8 flex-wrap">
           <a href="https://mail.google.com/mail/?view=cm&fs=1&to=beantradition@gmail.com" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">Email</a>
           <a href="https://www.instagram.com/beantradition/" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">Instagram</a>
-          <a href="https://wa.me/919985802734" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors flex items-center gap-1">
-            <span>+91-9985802734</span>
+          <a href="https://wa.me/919985802734" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">WhatsApp</a>
+          <a href="tel:+919985802734" className="hover:text-gold-400 transition-colors flex items-center gap-1 font-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>
+            +91 99858 02734
           </a>
         </div>
         <div className="mt-8 pt-8 border-t border-white/10 flex flex-col items-center gap-2">
@@ -290,7 +285,15 @@ function App() {
       <div className="bg-coffee-50 min-h-screen flex flex-col">
         <Hero onShopNow={() => setView(AppView.SHOP)} />
         <USP />
-        <ProductList mode="home" onProductClick={() => { }} onAddToCart={() => { }} onNavigateToShop={() => setView(AppView.SHOP)} />
+        <ProductList 
+          mode="home" 
+          cart={cart}
+          onProductClick={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} 
+          onAddToCart={(p) => { setSelectedProduct(p); setIsModalOpen(true); }} 
+          onNavigateToShop={() => setView(AppView.SHOP)}
+          onUpdateQuantity={updateQuantityComposite}
+          onQuickAdd={(p, v) => addToCart({ ...p, selectedVariant: v, quantity: 1 })}
+        />
         <ProducerSection />
         <Footer />
       </div>

@@ -47,7 +47,11 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
 
   // Filter Logic
   const validProducts = Array.isArray(products) ? products : [];
-  const sourceProducts = validProducts.length > 0 ? validProducts : PRODUCTS; // Fallback to local constants if fetch fails
+  // Merge local updated variants and ordering with database dynamic fields (like stock)
+  const sourceProducts = PRODUCTS.map(localProduct => {
+    const dbProduct = validProducts.find(p => p.name === localProduct.name);
+    return dbProduct ? { ...dbProduct, variants: localProduct.variants } : localProduct;
+  });
 
   const displayProducts = mode === 'home'
     ? sourceProducts.slice(0, 3)
@@ -289,7 +293,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 )}
 
                 {/* Variant Selection for Card */}
-                {mode === 'shop' && product.variants.length > 1 && (
+                {product.variants.length > 1 && (
                   <div className="mb-4" onClick={e => e.stopPropagation()}>
                     <div className="flex gap-2 overflow-x-auto hide-scrollbar">
                       {product.variants.map((v, i) => {
@@ -312,7 +316,7 @@ export const ProductList: React.FC<ProductListProps> = ({ mode, onProductClick, 
                 <div className="flex items-center justify-between mt-auto pt-3 md:pt-4 border-t border-gray-100 group-hover:border-gold-100 transition-colors" onClick={e => e.stopPropagation()}>
                   <span className="text-base md:text-xl font-serif font-bold text-coffee-900">₹{getVariant(product).price}</span>
 
-                  {mode === 'shop' && cart && onUpdateQuantity && onQuickAdd && (
+                  {cart && onUpdateQuantity && onQuickAdd && (
                     (() => {
                       const defaultVariant = getVariant(product);
                       const currentIntensity = getIntensity(product.id);
