@@ -57,7 +57,7 @@ var SETTINGS_SEED = [
   ['Brand Name', 'Bean Tradition'],
   ['Order Prefix', 'BT'],
   ['Default Country Code', '+91'],
-  ['Initial Order Status', 'PREPARING'],
+  ['Initial Order Status', 'RECEIVED'],
   ['Queue Display Limit', 20],
   ['Tracking Poll Interval', 3000],
   ['WhatsApp Template Language', 'en'],

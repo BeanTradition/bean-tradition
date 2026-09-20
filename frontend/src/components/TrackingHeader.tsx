@@ -5,12 +5,9 @@ export function TrackingHeader() {
       <img
         src="/bean-tradition-logo.png"
         alt="Bean Tradition"
-        className="h-20 w-auto object-contain"
+        className="h-24 w-auto object-contain"
       />
-      <h1 className="mt-3 font-display text-2xl font-extrabold uppercase tracking-[0.2em] text-espresso">
-        Bean Tradition
-      </h1>
-      <p className="text-sm font-medium text-mocha">Live order tracking</p>
+      <p className="mt-3 text-sm font-medium text-mocha">Live order tracking</p>
     </header>
   );
 }

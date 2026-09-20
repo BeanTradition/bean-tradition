@@ -60,12 +60,9 @@ export function Login() {
         <img
           src="/bean-tradition-logo.png"
           alt="Bean Tradition"
-          className="mx-auto h-24 w-auto object-contain"
+          className="mx-auto h-28 w-auto object-contain"
         />
-        <h1 className="mt-4 font-display text-3xl font-extrabold uppercase tracking-[0.18em] text-espresso">
-          Bean Tradition
-        </h1>
-        <p className="mt-1 font-medium text-mocha">Staff sign in</p>
+        <p className="mt-4 font-medium text-mocha">Staff sign in</p>
       </div>
 
       <form onSubmit={handleSubmit} className="card p-6">

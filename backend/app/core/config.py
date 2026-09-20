@@ -54,7 +54,7 @@ class Settings(BaseSettings):
     # --- Business config ---
     default_country_code: str = Field(default="+91", alias="DEFAULT_COUNTRY_CODE")
     order_prefix: str = Field(default="BT", alias="ORDER_PREFIX")
-    initial_order_status: str = Field(default="PREPARING", alias="INITIAL_ORDER_STATUS")
+    initial_order_status: str = Field(default="RECEIVED", alias="INITIAL_ORDER_STATUS")
     tracking_poll_interval_ms: int = Field(default=3000, alias="TRACKING_POLL_INTERVAL_MS")
     queue_display_limit: int = Field(default=20, alias="QUEUE_DISPLAY_LIMIT")
     brand_name: str = Field(default="Bean Tradition", alias="BRAND_NAME")

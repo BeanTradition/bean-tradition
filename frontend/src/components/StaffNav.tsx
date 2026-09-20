@@ -13,22 +13,17 @@ export function StaffNav() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `rounded-xl px-3 py-2 text-sm font-bold transition ${
-      isActive ? 'bg-cream text-espresso' : 'text-cream/80 hover:bg-cream/10'
+      isActive ? 'bg-espresso text-cream' : 'text-espresso/80 hover:bg-espresso/10'
     }`;
 
   return (
-    <nav className="sticky top-0 z-30 flex items-center justify-between bg-espresso px-3 py-2 shadow-card">
+    <nav className="sticky top-0 z-30 flex items-center justify-between border-b border-sand/70 bg-white px-3 py-2 shadow-card">
       <div className="flex items-center gap-2">
-        <span className="flex items-center justify-center rounded-lg bg-cream p-1">
-          <img
-            src="/bean-tradition-logo.png"
-            alt="Bean Tradition"
-            className="h-10 w-auto object-contain"
-          />
-        </span>
-        <span className="hidden font-display text-sm font-extrabold uppercase tracking-widest text-cream sm:inline">
-          Bean Tradition
-        </span>
+        <img
+          src="/bean-tradition-logo.png"
+          alt="Bean Tradition"
+          className="h-12 w-auto object-contain"
+        />
       </div>
       <div className="flex items-center gap-1">
         <NavLink to="/place-order" className={linkClass}>
@@ -40,7 +35,7 @@ export function StaffNav() {
         <button
           type="button"
           onClick={handleLogout}
-          className="rounded-xl px-3 py-2 text-sm font-bold text-cream/80 hover:bg-cream/10"
+          className="rounded-xl px-3 py-2 text-sm font-bold text-espresso/80 hover:bg-espresso/10"
         >
           Logout
         </button>
