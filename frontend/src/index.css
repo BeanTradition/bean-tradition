@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-cream text-bean font-sans antialiased;
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Prevent iOS zoom on input focus by keeping font-size >= 16px */
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl font-semibold
+      transition active:scale-[0.98] select-none disabled:opacity-50
+      disabled:pointer-events-none focus:outline-none focus-visible:ring-2
+      focus-visible:ring-caramel/60;
+  }
+
+  .btn-lg {
+    @apply px-6 py-4 text-lg min-h-[56px];
+  }
+
+  .btn-primary {
+    @apply bg-espresso text-cream shadow-card hover:bg-bean;
+  }
+
+  .btn-secondary {
+    @apply bg-latte text-espresso hover:bg-sand;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-espresso hover:bg-latte;
+  }
+
+  .btn-danger {
+    @apply bg-cancelled text-white hover:brightness-95;
+  }
+
+  .btn-success {
+    @apply bg-ready text-white hover:brightness-95;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-sand bg-white px-4 py-3 text-bean
+      shadow-sm placeholder:text-mocha/50 focus:border-caramel focus:outline-none
+      focus:ring-2 focus:ring-caramel/40;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-espresso;
+  }
+
+  .card {
+    @apply rounded-2xl border border-sand/70 bg-white shadow-card;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+}
+
+/* Subtle pulse for live "READY" state on tracking page */
+@keyframes readyGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(47, 143, 78, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(47, 143, 78, 0);
+  }
+}
+
+.animate-ready-glow {
+  animation: readyGlow 1.6s ease-out infinite;
+}
