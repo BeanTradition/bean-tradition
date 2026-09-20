@@ -22,7 +22,7 @@ def _set_session_cookie(response: Response, token: str) -> None:
         max_age=settings.session_max_age_seconds,
         httponly=True,
         secure=settings.cookie_secure,
-        samesite="lax",
+        samesite=settings.cookie_samesite,
         path="/",
     )
 
@@ -45,7 +45,12 @@ def login(
 @router.post("/logout", response_model=LoginResponse)
 def logout(response: Response) -> LoginResponse:
     settings = get_settings()
-    response.delete_cookie(settings.session_cookie_name, path="/")
+    response.delete_cookie(
+        settings.session_cookie_name,
+        path="/",
+        samesite=settings.cookie_samesite,
+        secure=settings.cookie_secure,
+    )
     return LoginResponse(success=True)
 
 

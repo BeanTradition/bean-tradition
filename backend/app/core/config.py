@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     session_secret: str = Field(default="dev-insecure-session-secret", alias="SESSION_SECRET")
     session_cookie_name: str = Field(default="bt_session", alias="SESSION_COOKIE_NAME")
     session_max_age_seconds: int = Field(default=60 * 60 * 16, alias="SESSION_MAX_AGE_SECONDS")
+    # "lax" for same-site (local dev, single-domain prod). Set "none" when the
+    # frontend and backend are on different domains (e.g. two *.vercel.app URLs);
+    # "none" requires HTTPS + secure cookies, which hold in production.
+    cookie_samesite: str = Field(default="lax", alias="COOKIE_SAMESITE")
 
     # --- URLs ---
     frontend_url: str = Field(default="http://localhost:5173", alias="FRONTEND_URL")
