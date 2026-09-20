@@ -2,9 +2,11 @@
 export function TrackingHeader() {
   return (
     <header className="flex flex-col items-center pt-8 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-espresso text-3xl">
-        ☕
-      </div>
+      <img
+        src="/bean-tradition-logo.png"
+        alt="Bean Tradition"
+        className="h-20 w-auto object-contain"
+      />
       <h1 className="mt-3 font-display text-2xl font-extrabold uppercase tracking-[0.2em] text-espresso">
         Bean Tradition
       </h1>

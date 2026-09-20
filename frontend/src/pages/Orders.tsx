@@ -14,6 +14,7 @@ import { StaffNav } from '../components/StaffNav';
 import { StatusColumn } from '../components/StatusColumn';
 import { OrderCard } from '../components/OrderCard';
 import { ConnectionStatus } from '../components/ConnectionStatus';
+import { BrandWatermark } from '../components/BrandWatermark';
 
 const BOARD_COLUMNS: OrderStatus[] = ['RECEIVED', 'PREPARING', 'READY'];
 
@@ -174,7 +175,8 @@ export function Orders() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-cream">
+    <div className="relative z-10 min-h-[100dvh]">
+      <BrandWatermark />
       <StaffNav />
 
       <div className="mx-auto max-w-6xl px-3 py-4">

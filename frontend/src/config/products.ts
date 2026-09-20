@@ -5,15 +5,16 @@ export interface ProductOption {
   name: string;
   /** Short label used on compact UI. */
   short: string;
+  /** Unit price in rupees (finalized event menu). */
+  price: number;
 }
 
-// Seed products for the event menu. Kept intentionally small and fast to tap.
+// Finalized event menu with confirmed prices (in rupees).
 export const PRODUCTS: ProductOption[] = [
-  { id: 'cappuccino', name: 'Cappuccino', short: 'Capp' },
-  { id: 'cold-coffee', name: 'Cold Coffee', short: 'Cold' },
-  { id: 'americano', name: 'Americano', short: 'Amer' },
-  { id: 'filter-coffee', name: 'Filter Coffee', short: 'Filter' },
-  { id: 'espresso', name: 'Espresso', short: 'Esp' },
+  { id: 'cappuccino', name: 'Cappuccino', short: 'Capp', price: 150 },
+  { id: 'americano-hot', name: 'Americano (Hot)', short: 'Hot Amer', price: 130 },
+  { id: 'iced-americano', name: 'Iced Americano', short: 'Iced Amer', price: 160 },
+  { id: 'cold-coffee', name: 'Cold Coffee', short: 'Cold', price: 180 },
 ];
 
 export const PAYMENT_METHODS: PaymentMethod[] = ['UPI', 'Cash'];

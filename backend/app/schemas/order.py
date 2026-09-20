@@ -57,6 +57,7 @@ class OrderPublic(BaseModel):
 
     order_id: str
     order_number: str
+    tracking_token: str
     created_at: str
     updated_at: str
     customer_name: str
@@ -81,6 +82,7 @@ class OrderPublic(BaseModel):
         return cls(
             order_id=o.order_id,
             order_number=o.order_number,
+            tracking_token=o.tracking_token,
             created_at=o.created_at,
             updated_at=o.updated_at,
             customer_name=o.customer_name,

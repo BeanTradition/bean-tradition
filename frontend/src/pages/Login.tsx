@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ApiError, getMe, login } from '../services/api';
+import { BrandWatermark } from '../components/BrandWatermark';
 
 interface LocationState {
   from?: string;
@@ -53,11 +54,14 @@ export function Login() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center px-4 py-10">
+    <div className="relative z-10 mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center px-4 py-10">
+      <BrandWatermark />
       <div className="mb-8 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-espresso text-4xl">
-          ☕
-        </div>
+        <img
+          src="/bean-tradition-logo.png"
+          alt="Bean Tradition"
+          className="mx-auto h-24 w-auto object-contain"
+        />
         <h1 className="mt-4 font-display text-3xl font-extrabold uppercase tracking-[0.18em] text-espresso">
           Bean Tradition
         </h1>

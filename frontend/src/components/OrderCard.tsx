@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { OrderPublic, OrderStatus } from '../types/order';
 import { formatAge, STATUS_DOT, STATUS_LABEL } from '../utils/format';
 import { WhatsAppStatusBadge } from './WhatsAppStatusBadge';
@@ -46,6 +46,36 @@ export function OrderCard({
   defaultExpanded = false,
 }: OrderCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const [copied, setCopied] = useState(false);
+  const copyTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimer.current) window.clearTimeout(copyTimer.current);
+    };
+  }, []);
+
+  const trackingUrl = `${window.location.origin}/track/${order.tracking_token}`;
+
+  const handleCopyLink = async () => {
+    const flagCopied = () => {
+      setCopied(true);
+      if (copyTimer.current) window.clearTimeout(copyTimer.current);
+      copyTimer.current = window.setTimeout(() => setCopied(false), 1500);
+    };
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        await navigator.clipboard.writeText(trackingUrl);
+        flagCopied();
+        return;
+      }
+    } catch {
+      /* clipboard blocked or unavailable: fall through to manual copy */
+    }
+    // Fallback for browsers without the async clipboard API.
+    window.prompt('Copy this tracking link:', trackingUrl);
+  };
+
   const next = NEXT_STATUS[order.status];
   const confirmationFailed = order.confirmation_status === 'FAILED';
   const isActive =
@@ -109,13 +139,23 @@ export function OrderCard({
         </button>
       )}
 
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="mt-2 text-sm font-semibold text-caramel"
-      >
-        {expanded ? 'Hide actions' : 'More actions'}
-      </button>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="rounded-lg px-2 py-1.5 text-sm font-semibold text-caramel hover:bg-latte"
+        >
+          {expanded ? 'Hide actions' : 'More actions'}
+        </button>
+        <button
+          type="button"
+          onClick={handleCopyLink}
+          aria-label="Copy customer tracking link"
+          className="rounded-lg px-2 py-1.5 text-sm font-semibold text-caramel hover:bg-latte"
+        >
+          {copied ? 'Copied!' : 'Copy link'}
+        </button>
+      </div>
 
       {expanded && (
         <div className="mt-2 space-y-2 border-t border-sand pt-3">

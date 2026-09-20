@@ -42,6 +42,7 @@ export interface OrderPublic {
   delivered_at: string | null;
   created_by: string;
   last_messaging_error: string | null;
+  tracking_token: string;
 }
 
 export interface CreateOrderRequest {

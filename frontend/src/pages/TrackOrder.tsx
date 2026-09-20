@@ -6,6 +6,7 @@ import { TrackingHeader } from '../components/TrackingHeader';
 import { TrackingQueue } from '../components/TrackingQueue';
 import { ReadyAlert } from '../components/ReadyAlert';
 import { ConnectionStatus } from '../components/ConnectionStatus';
+import { BrandWatermark } from '../components/BrandWatermark';
 
 const BASE_TITLE = 'Bean Tradition';
 
@@ -97,7 +98,8 @@ export function TrackOrder() {
 
   if (invalid) {
     return (
-      <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col items-center justify-center px-4 text-center">
+      <div className="relative z-10 mx-auto flex min-h-[100dvh] max-w-md flex-col items-center justify-center px-4 text-center">
+        <BrandWatermark />
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-cancelled/15 text-3xl">
           ✕
         </div>
@@ -112,7 +114,8 @@ export function TrackOrder() {
   }
 
   return (
-    <div className="mx-auto min-h-[100dvh] max-w-md px-4 pb-10">
+    <div className="relative z-10 mx-auto min-h-[100dvh] max-w-md px-4 pb-10">
+      <BrandWatermark />
       <TrackingHeader />
 
       {!myOrder ? (

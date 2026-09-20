@@ -19,8 +19,12 @@ export function StaffNav() {
   return (
     <nav className="sticky top-0 z-30 flex items-center justify-between bg-espresso px-3 py-2 shadow-card">
       <div className="flex items-center gap-2">
-        <span className="text-xl" aria-hidden>
-          ☕
+        <span className="flex items-center justify-center rounded-lg bg-cream p-1">
+          <img
+            src="/bean-tradition-logo.png"
+            alt="Bean Tradition"
+            className="h-10 w-auto object-contain"
+          />
         </span>
         <span className="hidden font-display text-sm font-extrabold uppercase tracking-widest text-cream sm:inline">
           Bean Tradition
